@@ -8,15 +8,15 @@ const Overview = () => {
       background: "linear-gradient(to bottom right, #e8eef9 0%, #f5f7fb 50%, #ffffff 100%)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       color: "#2d3748",
-      padding: "16px 20px",
+      padding: "12px 16px",
       boxSizing: "border-box",
       overflow: "hidden",
     },
     topBar: {
       display: "flex",
-      justifyContent: "flex-end",
+      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "12px",
+      marginBottom: "8px",
       gap: "12px",
     },
     topBarRight: {
@@ -55,18 +55,24 @@ const Overview = () => {
     },
     welcomeSection: {
       display: "flex",
-      justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "12px",
+    },
+    rightSection: {
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
+      alignItems: "flex-end",
     },
     welcomeText: {
-      fontSize: "32px",
-      fontWeight: 600,
+      fontSize: "52px",
+      fontWeight: 700,
+      fontFamily: "'Dancing Script', cursive",
       background: "linear-gradient(135deg, #5a67d8 0%, #7b8cd9 100%)",
       WebkitBackgroundClip: "text",
       WebkitTextFillColor: "transparent",
       backgroundClip: "text",
       letterSpacing: "-0.5px",
+      WebkitTextStroke: "1px #5a67d8",
     },
     newMemoryBtn: {
       padding: "10px 24px",
@@ -290,7 +296,7 @@ const Overview = () => {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Kalam:wght@400&family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Kalam:wght@400&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@600;700&display=swap');
         
         * {
           margin: 0;
@@ -376,18 +382,18 @@ const Overview = () => {
       <div style={styles.page}>
         {/* Top Bar */}
         <div style={styles.topBar}>
-          <button className="icon-btn" style={styles.iconButton}>🔔</button>
-          <button className="icon-btn" style={styles.iconButton}>❓</button>
-          <div style={styles.avatar}>👤</div>
-        </div>
-
-        {/* Welcome Section */}
-        <div style={styles.welcomeSection}>
-          <h2 style={styles.welcomeText}>Welcome back, Alex!</h2>
-          <button style={styles.newMemoryBtn}>
-            <span>+</span>
-            New Memory
-          </button>
+          {/* Welcome Section */}
+          <div style={styles.welcomeSection}>
+            <h2 style={styles.welcomeText}>Welcome back, Alex!</h2>
+          </div>
+          
+          <div style={styles.rightSection}>
+            <div style={styles.avatar}>👤</div>
+            <button style={styles.newMemoryBtn}>
+              <span>+</span>
+              New Memory
+            </button>
+          </div>
         </div>
 
         {/* Main Content */}
