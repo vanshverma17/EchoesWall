@@ -76,7 +76,8 @@ export const deleteWallSnapshot = async (id) => {
   );
 };
 
-export const saveEchoes = async (items = []) => {
+export const saveEchoes = async (items = [], options = {}) => {
+  const { wallId } = options;
   const payload = {
     items: items.map(({ type, text, src, color, top, left }) => ({
       type,
@@ -88,10 +89,13 @@ export const saveEchoes = async (items = []) => {
     })),
   };
 
+  const endpoint = wallId ? `${API_BASE_URL}/api/walls/${wallId}` : `${API_BASE_URL}/api/walls`;
+  const method = wallId ? "PUT" : "POST";
+
   try {
     const data = await handleResponse(
-      await fetch(`${API_BASE_URL}/api/walls`, {
-        method: "POST",
+      await fetch(endpoint, {
+        method,
         headers: {
           "Content-Type": "application/json",
         },

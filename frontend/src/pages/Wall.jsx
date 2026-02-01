@@ -112,8 +112,13 @@ const Wall = ({ isNew = false }) => {
     setSaving(true);
     setError("");
     try {
-      const cleanedItems = items.filter((it) => it && it.type);
-      const persisted = await saveEchoes(cleanedItems);
+      const cleanedItems = items
+        .filter((it) => it && it.type)
+        .map((it) => ({
+          ...it,
+          id: it.id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+        }));
+      const persisted = await saveEchoes(cleanedItems, { wallId: wallId && !isNewWall ? wallId : undefined });
       setItems(persisted);
       setSaved(true);
     } catch (err) {
@@ -138,7 +143,15 @@ const Wall = ({ isNew = false }) => {
       } else {
         existing = await fetchEchoes({ signal: controller.signal });
       }
-      setItems(Array.isArray(existing) ? existing.filter((it) => it && it.type) : []);
+      const normalized = Array.isArray(existing)
+        ? existing
+            .filter((it) => it && it.type)
+            .map((it) => ({
+              ...it,
+              id: it.id || it._id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+            }))
+        : [];
+      setItems(normalized);
       setSaved(true);
     } catch (err) {
       console.error(err);

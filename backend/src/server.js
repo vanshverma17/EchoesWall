@@ -29,6 +29,7 @@ mongoose.set("strictQuery", true);
 
 const echoItemSchema = new mongoose.Schema(
   {
+    id: { type: String, default: undefined },
     type: { type: String, enum: ["note", "image", "thought"], required: true },
     text: { type: String, default: "", trim: true },
     src: { type: String, default: "", trim: true },
@@ -55,10 +56,13 @@ const wallSnapshotSchema = new mongoose.Schema(
 
 const WallSnapshot = mongoose.model("WallSnapshot", wallSnapshotSchema);
 
+const createItemId = () => `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`;
+
 const sanitizeItems = (items = []) =>
   items
     .filter((item) => item && item.type)
     .map((item) => ({
+      id: item.id || item._id || createItemId(),
       type: item.type,
       text: item.text || "",
       src: item.src || "",
@@ -66,6 +70,21 @@ const sanitizeItems = (items = []) =>
       top: item.top || "40px",
       left: item.left || "40px",
     }));
+
+const ensureItemsHaveIds = (items = []) =>
+  items.map((item) => ({
+    ...item,
+    id: item.id || item._id || createItemId(),
+  }));
+
+const attachItemIds = (snapshot) => {
+  if (!snapshot) return snapshot;
+  const doc = snapshot.toObject ? snapshot.toObject() : snapshot;
+  return {
+    ...doc,
+    items: ensureItemsHaveIds(doc.items || []),
+  };
+};
 
 const userSchema = new mongoose.Schema(
   {
@@ -163,7 +182,7 @@ app.get("/api/walls/latest", async (_req, res, next) => {
     if (!latest) {
       return res.json({ items: [] });
     }
-    res.json(latest);
+    res.json(attachItemIds(latest));
   } catch (err) {
     next(err);
   }
@@ -176,7 +195,7 @@ app.get("/api/walls/:id", async (req, res, next) => {
     if (!wall) {
       return res.status(404).json({ message: "Wall not found" });
     }
-    res.json(wall);
+    res.json(attachItemIds(wall));
   } catch (err) {
     next(err);
   }
@@ -192,7 +211,32 @@ app.post("/api/walls", async (req, res, next) => {
     const sanitized = sanitizeItems(items);
 
     const wall = await WallSnapshot.create({ items: sanitized });
-    res.status(201).json(wall);
+    res.status(201).json(attachItemIds(wall));
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.put("/api/walls/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { items } = req.body || {};
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: "items array is required" });
+    }
+
+    const sanitized = sanitizeItems(items);
+    const wall = await WallSnapshot.findByIdAndUpdate(
+      id,
+      { items: sanitized },
+      { new: true, runValidators: true }
+    );
+
+    if (!wall) {
+      return res.status(404).json({ message: "Wall not found" });
+    }
+
+    res.json(attachItemIds(wall));
   } catch (err) {
     next(err);
   }
@@ -227,7 +271,8 @@ app.get("/api/echoes", async (_req, res, next) => {
     if (!latest) {
       return res.json([]);
     }
-    res.json(latest.items || []);
+    const snapshot = attachItemIds(latest);
+    res.json(snapshot.items || []);
   } catch (err) {
     next(err);
   }
@@ -242,7 +287,8 @@ app.put("/api/echoes", async (req, res, next) => {
 
     const sanitized = sanitizeItems(items);
     const wall = await WallSnapshot.create({ items: sanitized });
-    res.json(wall.items || []);
+    const snapshot = attachItemIds(wall);
+    res.json(snapshot.items || []);
   } catch (err) {
     next(err);
   }
