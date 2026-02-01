@@ -48,7 +48,7 @@ const Overview = () => {
     avatar: {
       width: "38px",
       height: "38px",
-      borderRadius: "10px",
+      borderRadius: "50%",
       background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
       display: "flex",
       alignItems: "center",

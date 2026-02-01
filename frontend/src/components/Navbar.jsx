@@ -8,7 +8,7 @@ const Navbar = () => {
       justifyContent: "space-between",
       alignItems: "center",
       padding: "8px 40px",
-      background: "rgba(255, 255, 255, 0.2)",
+      background: "rgba(255, 255, 255, 0.21)", 
       backdropFilter: "blur(30px) saturate(200%) brightness(110%)",
       WebkitBackdropFilter: "blur(30px) saturate(200%) brightness(110%)",
       boxShadow: "0 1px 8px rgba(0, 0, 0, 0.04), 0 4px 16px rgba(123, 140, 217, 0.08)",
@@ -40,7 +40,7 @@ const Navbar = () => {
     profile: {
       width: "36px",
       height: "36px",
-      borderRadius: "10px",
+      borderRadius: "50%",
       background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
       display: "flex",
       alignItems: "center",

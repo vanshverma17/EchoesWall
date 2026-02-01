@@ -5,6 +5,7 @@ const Wall = () => {
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
   const [formData, setFormData] = useState({ text: "", url: "", color: "" });
+  const [uploadedFile, setUploadedFile] = useState(null);
   const [dragging, setDragging] = useState(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const draggingMetaRef = useRef(null);
@@ -16,34 +17,53 @@ const Wall = () => {
     setModalType(type);
     const defaultColor = type === "note" ? "#fff9c4" : "#ffffff";
     setFormData({ text: "", url: "", color: defaultColor });
+    setUploadedFile(null);
     setShowModal(true);
   };
 
   const closeModal = () => {
     setShowModal(false);
     setFormData({ text: "", url: "", color: "" });
+    setUploadedFile(null);
   };
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (modalType === "image" && !formData.url) return;
+    if (modalType === "image" && !formData.url && !uploadedFile) return;
     if ((modalType === "note" || modalType === "thought") && !formData.text) return;
 
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const top = Math.floor(40 + Math.random() * 400);
     const left = Math.floor(40 + Math.random() * 600);
     
-    const newItem = {
-      id,
-      type: modalType,
-      top: `${top}px`,
-      left: `${left}px`,
-      ...(modalType === "image" ? { src: formData.url } : { text: formData.text, color: formData.color })
-    };
-    
-    setItems((s) => [...s, newItem]);
-    setSaved(false);
-    closeModal();
+    if (modalType === "image" && uploadedFile) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const newItem = {
+          id,
+          type: modalType,
+          top: `${top}px`,
+          left: `${left}px`,
+          src: event.target.result
+        };
+        setItems((s) => [...s, newItem]);
+        setSaved(false);
+        closeModal();
+      };
+      reader.readAsDataURL(uploadedFile);
+    } else {
+      const newItem = {
+        id,
+        type: modalType,
+        top: `${top}px`,
+        left: `${left}px`,
+        ...(modalType === "image" ? { src: formData.url } : { text: formData.text, color: formData.color })
+      };
+      
+      setItems((s) => [...s, newItem]);
+      setSaved(false);
+      closeModal();
+    }
   };
 
   const removeItem = (id) => {
@@ -146,6 +166,14 @@ const Wall = () => {
     draggingMetaRef.current = null;
     elRef.current = null;
     setDragging(null);
+  };
+
+  const handleFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (file && file.type.startsWith('image/')) {
+      setUploadedFile(file);
+      setFormData({ ...formData, url: "" });
+    }
   };
 
   const styles = {
@@ -299,6 +327,9 @@ const Wall = () => {
       borderRadius: "20px",
       overflow: "auto",
       boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1)",
+      width: "calc(100% - 100px)",
+      height: "85%",
+      margin: "0",
     },
     canvas: {
       height: "100%",
@@ -562,6 +593,48 @@ const Wall = () => {
       fontSize: "15px",
       transition: "all 0.3s ease",
     },
+    uploadButton: {
+      width: "100%",
+      padding: "12px",
+      borderRadius: "10px",
+      border: "2px dashed rgba(123, 140, 217, 0.3)",
+      background: "rgba(123, 140, 217, 0.05)",
+      color: "#7b8cd9",
+      cursor: "pointer",
+      fontWeight: 600,
+      fontSize: "14px",
+      transition: "all 0.3s ease",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: "8px",
+    },
+    filePreview: {
+      marginTop: "12px",
+      padding: "12px",
+      borderRadius: "10px",
+      background: "rgba(102, 187, 106, 0.1)",
+      color: "#66bb6a",
+      fontSize: "13px",
+      fontWeight: 600,
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+    },
+    divider: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      margin: "16px 0",
+      color: "#a0aec0",
+      fontSize: "13px",
+      fontWeight: 500,
+    },
+    dividerLine: {
+      flex: 1,
+      height: "1px",
+      background: "rgba(123, 140, 217, 0.2)",
+    },
   };
 
   return (
@@ -759,17 +832,53 @@ const Wall = () => {
               </h3>
               <form onSubmit={handleSubmit}>
                 {modalType === "image" ? (
-                  <div style={styles.formGroup}>
-                    <label style={styles.label}>Image URL</label>
-                    <input
-                      type="url"
-                      style={styles.input}
-                      value={formData.url}
-                      onChange={(e) => setFormData({ ...formData, url: e.target.value })}
-                      placeholder="https://example.com/image.jpg"
-                      required
-                    />
-                  </div>
+                  <>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Upload Image</label>
+                      <label htmlFor="file-upload" style={styles.uploadButton}>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                          <polyline points="17 8 12 3 7 8"/>
+                          <line x1="12" y1="3" x2="12" y2="15"/>
+                        </svg>
+                        Choose Image from Device
+                      </label>
+                      <input
+                        id="file-upload"
+                        type="file"
+                        accept="image/*"
+                        style={{display: "none"}}
+                        onChange={handleFileUpload}
+                      />
+                      {uploadedFile && (
+                        <div style={styles.filePreview}>
+                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                            <polyline points="20 6 9 17 4 12"/>
+                          </svg>
+                          {uploadedFile.name}
+                        </div>
+                      )}
+                    </div>
+                    <div style={styles.divider}>
+                      <div style={styles.dividerLine}></div>
+                      <span>OR</span>
+                      <div style={styles.dividerLine}></div>
+                    </div>
+                    <div style={styles.formGroup}>
+                      <label style={styles.label}>Image URL</label>
+                      <input
+                        type="url"
+                        style={styles.input}
+                        value={formData.url}
+                        onChange={(e) => {
+                          setFormData({ ...formData, url: e.target.value });
+                          setUploadedFile(null);
+                        }}
+                        placeholder="https://example.com/image.jpg"
+                        disabled={!!uploadedFile}
+                      />
+                    </div>
+                  </>
                 ) : (
                   <>
                     <div style={styles.formGroup}>
