@@ -35,3 +35,29 @@ export const login = async ({ email, password }) => {
     })
   );
 };
+
+export const setStoredUser = (user) => {
+  try {
+    localStorage.setItem("echoesUser", JSON.stringify(user));
+  } catch (err) {
+    console.error("Failed to persist user", err);
+  }
+};
+
+export const getStoredUser = () => {
+  try {
+    const raw = localStorage.getItem("echoesUser");
+    return raw ? JSON.parse(raw) : null;
+  } catch (err) {
+    console.error("Failed to read stored user", err);
+    return null;
+  }
+};
+
+export const clearStoredUser = () => {
+  try {
+    localStorage.removeItem("echoesUser");
+  } catch (err) {
+    console.error("Failed to clear stored user", err);
+  }
+};

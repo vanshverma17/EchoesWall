@@ -1,7 +1,12 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { getStoredUser, clearStoredUser } from "../services/authApi";
 
 const Navbar = () => {
+  const navigate = useNavigate();
+  const user = getStoredUser();
+  const initials = user?.name?.slice(0, 1)?.toUpperCase() || user?.email?.slice(0, 1)?.toUpperCase() || "👤";
+
   const styles = {
     navbar: {
       display: "flex",
@@ -52,6 +57,29 @@ const Navbar = () => {
       cursor: "pointer",
       transition: "all 0.3s ease",
     },
+    userName: {
+      fontSize: "13px",
+      fontWeight: 600,
+      color: "#4a5568",
+    },
+    userWrap: {
+      display: "flex",
+      alignItems: "center",
+      gap: "10px",
+    },
+    logout: {
+      fontSize: "12px",
+      color: "#7b8cd9",
+      cursor: "pointer",
+      border: "none",
+      background: "transparent",
+      fontWeight: 600,
+    },
+  };
+
+  const handleLogout = () => {
+    clearStoredUser();
+    navigate("/signin");
   };
 
   return (
@@ -84,8 +112,16 @@ const Navbar = () => {
           <Link to="/wall" className="nav-link" style={styles.navLink}>
             Wall
           </Link>
-          <div className="profile-avatar" style={styles.profile}>
-            👤
+          <div style={styles.userWrap}>
+            <div className="profile-avatar" style={styles.profile} title={user?.email || "User"}>
+              {initials}
+            </div>
+            {user && <span style={styles.userName}>{user.name || user.email}</span>}
+            {user && (
+              <button style={styles.logout} onClick={handleLogout}>
+                Logout
+              </button>
+            )}
           </div>
         </div>
       </nav>

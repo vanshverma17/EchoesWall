@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { login } from "../services/authApi";
+import { login, setStoredUser } from "../services/authApi";
 
 const Signin = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -245,7 +245,8 @@ const Signin = () => {
     setStatus("");
     setLoading(true);
     try {
-      await login({ email, password });
+      const user = await login({ email, password });
+      setStoredUser(user);
       setStatus("Connected! Redirecting...");
       setTimeout(() => navigate("/overview"), 400);
     } catch (err) {

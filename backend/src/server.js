@@ -23,11 +23,11 @@ app.use(
     origin: CLIENT_ORIGIN && CLIENT_ORIGIN.length ? CLIENT_ORIGIN : "*",
   })
 );
-app.use(express.json({ limit: "10mb" }));
+app.use(express.json({ limit: "25mb" }));
 
 mongoose.set("strictQuery", true);
 
-const echoSchema = new mongoose.Schema(
+const echoItemSchema = new mongoose.Schema(
   {
     type: { type: String, enum: ["note", "image", "thought"], required: true },
     text: { type: String, default: "", trim: true },
@@ -37,13 +37,35 @@ const echoSchema = new mongoose.Schema(
     left: { type: String, default: "40px", trim: true },
   },
   {
-    collection: "echoes",
+    _id: false,
+    versionKey: false,
+  }
+);
+
+const wallSnapshotSchema = new mongoose.Schema(
+  {
+    items: { type: [echoItemSchema], default: [] },
+  },
+  {
+    collection: "wallSnapshots",
     timestamps: true,
     versionKey: false,
   }
 );
 
-const Echo = mongoose.model("Echo", echoSchema);
+const WallSnapshot = mongoose.model("WallSnapshot", wallSnapshotSchema);
+
+const sanitizeItems = (items = []) =>
+  items
+    .filter((item) => item && item.type)
+    .map((item) => ({
+      type: item.type,
+      text: item.text || "",
+      src: item.src || "",
+      color: item.color || "",
+      top: item.top || "40px",
+      left: item.left || "40px",
+    }));
 
 const userSchema = new mongoose.Schema(
   {
@@ -126,23 +148,60 @@ app.post("/api/auth/login", async (req, res, next) => {
   }
 });
 
-app.get("/api/echoes", async (_req, res, next) => {
+app.get("/api/walls", async (_req, res, next) => {
   try {
-    const echoes = await Echo.find({}).sort({ updatedAt: -1 });
-    res.json(echoes);
+    const walls = await WallSnapshot.find({}).sort({ updatedAt: -1 });
+    res.json(walls);
   } catch (err) {
     next(err);
   }
 });
 
-app.post("/api/echoes", async (req, res, next) => {
+app.get("/api/walls/latest", async (_req, res, next) => {
   try {
-    const payload = req.body || {};
-    if (!payload.type) {
-      return res.status(400).json({ message: "type is required" });
+    const latest = await WallSnapshot.findOne({}).sort({ updatedAt: -1 });
+    if (!latest) {
+      return res.json({ items: [] });
     }
-    const echo = await Echo.create(payload);
-    res.status(201).json(echo);
+    res.json(latest);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.post("/api/walls", async (req, res, next) => {
+  try {
+    const { items } = req.body || {};
+    if (!Array.isArray(items)) {
+      return res.status(400).json({ message: "items array is required" });
+    }
+
+    const sanitized = sanitizeItems(items);
+
+    const wall = await WallSnapshot.create({ items: sanitized });
+    res.status(201).json(wall);
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete("/api/walls", async (_req, res, next) => {
+  try {
+    await WallSnapshot.deleteMany({});
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+// Back-compat routes for older clients expecting /api/echoes
+app.get("/api/echoes", async (_req, res, next) => {
+  try {
+    const latest = await WallSnapshot.findOne({}).sort({ updatedAt: -1 });
+    if (!latest) {
+      return res.json([]);
+    }
+    res.json(latest.items || []);
   } catch (err) {
     next(err);
   }
@@ -155,23 +214,9 @@ app.put("/api/echoes", async (req, res, next) => {
       return res.status(400).json({ message: "items array is required" });
     }
 
-    await Echo.deleteMany({});
-
-    if (!items.length) {
-      return res.json([]);
-    }
-
-    const sanitized = items.map((item) => ({
-      type: item.type,
-      text: item.text || "",
-      src: item.src || "",
-      color: item.color || "",
-      top: item.top || "40px",
-      left: item.left || "40px",
-    }));
-
-    const inserted = await Echo.insertMany(sanitized);
-    res.json(inserted);
+    const sanitized = sanitizeItems(items);
+    const wall = await WallSnapshot.create({ items: sanitized });
+    res.json(wall.items || []);
   } catch (err) {
     next(err);
   }
@@ -179,20 +224,7 @@ app.put("/api/echoes", async (req, res, next) => {
 
 app.delete("/api/echoes", async (_req, res, next) => {
   try {
-    await Echo.deleteMany({});
-    res.status(204).send();
-  } catch (err) {
-    next(err);
-  }
-});
-
-app.delete("/api/echoes/:id", async (req, res, next) => {
-  try {
-    const { id } = req.params;
-    const result = await Echo.findByIdAndDelete(id);
-    if (!result) {
-      return res.status(404).json({ message: "Echo not found" });
-    }
+    await WallSnapshot.deleteMany({});
     res.status(204).send();
   } catch (err) {
     next(err);

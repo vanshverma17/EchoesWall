@@ -1,7 +1,11 @@
 import React, { useState, useRef } from "react";
+import { useLocation } from "react-router-dom";
 import { fetchEchoes, saveEchoes, deleteAllEchoes } from "../services/echoesApi";
+import { getStoredUser } from "../services/authApi";
 
-const Wall = () => {
+const Wall = ({ isNew = false }) => {
+  const location = useLocation();
+  const isNewWall = isNew || location.pathname.startsWith("/wall/new");
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
   const [modalType, setModalType] = useState("");
@@ -16,6 +20,7 @@ const Wall = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [owner, setOwner] = useState("");
 
   const openModal = (type) => {
     setModalType(type);
@@ -103,12 +108,13 @@ const Wall = () => {
     setSaving(true);
     setError("");
     try {
-      const persisted = await saveEchoes(items);
+      const cleanedItems = items.filter((it) => it && it.type);
+      const persisted = await saveEchoes(cleanedItems);
       setItems(persisted);
       setSaved(true);
     } catch (err) {
       console.error(err);
-      setError("Saving failed. Please try again.");
+      setError(err?.message || "Saving failed. Please try again.");
       setSaved(false);
     } finally {
       setSaving(false);
@@ -118,22 +124,39 @@ const Wall = () => {
   const loadWall = async () => {
     setLoading(true);
     setError("");
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
-      const existing = await fetchEchoes();
-      setItems(existing);
+      const existing = await fetchEchoes({ signal: controller.signal });
+      setItems(Array.isArray(existing) ? existing.filter((it) => it && it.type) : []);
       setSaved(true);
     } catch (err) {
       console.error(err);
-      setError("Unable to load your wall right now.");
+      const message = err?.name === "AbortError" ? "Request timed out. Please try again." : "Unable to load your wall right now.";
+      setError(message);
       setSaved(false);
     } finally {
+      clearTimeout(timeoutId);
       setLoading(false);
     }
   };
 
   React.useEffect(() => {
+    const user = getStoredUser();
+    if (user) {
+      const name = user.name || user.email || "Friend";
+      setOwner(name.split(" ")[0] || name);
+    }
+
+    if (isNewWall) {
+      setItems([]);
+      setSaved(false);
+      setLoading(false);
+      return;
+    }
+
     loadWall();
-  }, []);
+  }, [isNewWall]);
 
   const zoomIn = () => {
     setZoom(prev => Math.min(prev + 0.1, 2));
@@ -797,7 +820,7 @@ const Wall = () => {
 
         <div style={styles.header}>
           <div style={styles.statusRow}>
-            <h2 style={styles.title}>Create Your Wall</h2>
+            <h2 style={styles.title}>Create Your Wall{owner ? `, ${owner}` : ""}</h2>
             {saving ? (
               <div style={styles.unsavedIndicator}>
                 <span>●</span>

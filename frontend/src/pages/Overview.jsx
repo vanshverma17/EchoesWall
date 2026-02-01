@@ -1,9 +1,37 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
+import { fetchEchoes } from "../services/echoesApi";
+import { getStoredUser } from "../services/authApi";
+
+const formatTimeAgo = (dateString) => {
+  if (!dateString) return "Just now";
+  const date = new Date(dateString);
+  const diffSeconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (Number.isNaN(diffSeconds) || diffSeconds < 0) return "Just now";
+  if (diffSeconds < 60) return `${diffSeconds}s ago`;
+  const diffMinutes = Math.floor(diffSeconds / 60);
+  if (diffMinutes < 60) return `${diffMinutes}m ago`;
+  const diffHours = Math.floor(diffMinutes / 60);
+  if (diffHours < 24) return `${diffHours}h ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays}d ago`;
+  const diffWeeks = Math.floor(diffDays / 7);
+  if (diffWeeks < 4) return `${diffWeeks}w ago`;
+  const diffMonths = Math.floor(diffDays / 30);
+  if (diffMonths < 12) return `${diffMonths}mo ago`;
+  const diffYears = Math.floor(diffDays / 365);
+  return `${diffYears}y ago`;
+};
 
 const Overview = () => {
   const navigate = useNavigate();
-  const [showAllRecent, setShowAllRecent] = React.useState(false);
+  const [firstName, setFirstName] = React.useState("Friend");
+  const [echoCount, setEchoCount] = React.useState(0);
+  const [echoLoading, setEchoLoading] = React.useState(true);
+  const [echoError, setEchoError] = React.useState("");
+  const [recentEchoes, setRecentEchoes] = React.useState([]);
+  const [recentLoading, setRecentLoading] = React.useState(true);
+  const [recentError, setRecentError] = React.useState("");
   const styles = {
     page: {
       minHeight: "100vh",
@@ -78,6 +106,12 @@ const Overview = () => {
       backgroundClip: "text",
       letterSpacing: "-0.5px",
       WebkitTextStroke: "1px #5a67d8",
+    },
+    welcomeSubtitle: {
+      marginTop: "4px",
+      fontSize: "16px",
+      fontWeight: 600,
+      color: "#4a5568",
     },
     newMemoryBtn: {
       padding: "10px 24px",
@@ -234,9 +268,9 @@ const Overview = () => {
       flexDirection: "column",
     },
     recentItemsContainer: {
-      maxHeight: "400px",
-      overflowY: "auto",
-      marginBottom: "8px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "12px",
     },
     sidebarHeader: {
       display: "flex",
@@ -252,37 +286,51 @@ const Overview = () => {
     },
     recentItem: {
       display: "flex",
+      alignItems: "center",
       gap: "12px",
-      padding: "8px",
-      borderRadius: "10px",
-      marginBottom: "6px",
+      padding: "10px",
+      borderRadius: "14px",
+      background: "linear-gradient(135deg, rgba(123, 140, 217, 0.08) 0%, rgba(255, 255, 255, 0.9) 100%)",
+      boxShadow: "0 4px 14px rgba(0, 0, 0, 0.06)",
+      border: "1px solid rgba(123, 140, 217, 0.15)",
       transition: "all 0.2s ease",
-      cursor: "pointer",
     },
     recentThumb: {
-      width: "52px",
-      height: "52px",
-      borderRadius: "10px",
+      width: "64px",
+      height: "64px",
+      borderRadius: "12px",
       objectFit: "cover",
-      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.08)",
+      background: "#e2e8f0",
+      border: "1px solid rgba(123, 140, 217, 0.1)",
+      flexShrink: 0,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontWeight: 700,
+      color: "#4a5568",
     },
     recentText: {
-      flex: 1,
       display: "flex",
       flexDirection: "column",
-      justifyContent: "center",
+      gap: "4px",
     },
     recentTitle: {
-      fontSize: "13.5px",
-      fontWeight: 600,
+      fontWeight: 700,
       color: "#2d3748",
-      marginBottom: "4px",
-      lineHeight: "1.4",
+      fontSize: "14px",
     },
     recentTime: {
       fontSize: "12px",
-      color: "#a0aec0",
+      color: "#718096",
       fontWeight: 500,
+    },
+    recentEmpty: {
+      padding: "12px",
+      borderRadius: "12px",
+      background: "rgba(123, 140, 217, 0.08)",
+      color: "#4a5568",
+      fontWeight: 600,
+      textAlign: "center",
     },
     viewAll: {
       textAlign: "center",
@@ -348,6 +396,45 @@ const Overview = () => {
       marginLeft: "-200px",
     },
   };
+
+  React.useEffect(() => {
+    const user = getStoredUser();
+    if (user) {
+      const name = user.name || user.email || "Friend";
+      setFirstName(name.split(" ")[0] || name);
+    }
+  }, []);
+
+  React.useEffect(() => {
+    const loadEchoes = async () => {
+      setEchoLoading(true);
+      setEchoError("");
+      setRecentLoading(true);
+      setRecentError("");
+      try {
+        const snapshots = await fetchEchoes({ history: true });
+        setEchoCount(snapshots.length);
+        setRecentEchoes(
+          [...snapshots].sort(
+            (a, b) => new Date(b.updatedAt || b.createdAt || 0) - new Date(a.updatedAt || a.createdAt || 0)
+          )
+        );
+        setRecentError("");
+      } catch {
+        setEchoError("Couldn't load echoes right now");
+        setRecentError("Couldn't load recent echoes");
+      } finally {
+        setEchoLoading(false);
+        setRecentLoading(false);
+      }
+    };
+
+    loadEchoes();
+  }, []);
+
+  const visibleRecentEchoes = React.useMemo(() => {
+    return Array.isArray(recentEchoes) ? [...recentEchoes] : [];
+  }, [recentEchoes]);
 
   return (
     <>
@@ -445,7 +532,16 @@ const Overview = () => {
         <div style={styles.topBar}>
           {/* Welcome Section */}
           <div style={styles.welcomeSection}>
-            <h2 style={styles.welcomeText}>Welcome back, Alex!</h2>
+            <div>
+              <h2 style={styles.welcomeText}>Welcome back, {firstName}!</h2>
+              <div style={styles.welcomeSubtitle}>
+                {echoLoading
+                  ? "Loading your echoes..."
+                  : echoError
+                  ? echoError
+                  : `You have ${echoCount} saved echoes`}
+              </div>
+            </div>
           </div>
         </div>
 
@@ -545,7 +641,7 @@ const Overview = () => {
           <div style={styles.sidebar}>
             {/* Search Bar with New Memory Button */}
             <div style={styles.searchContainer}>
-              <button style={styles.newMemoryTall} onClick={() => navigate('/wall')} aria-label="Create New Memory">
+              <button style={styles.newMemoryTall} onClick={() => navigate('/wall/new')} aria-label="Create New Memory">
                 +
               </button>
               <input
@@ -570,135 +666,32 @@ const Overview = () => {
               </div>
 
               <div style={styles.recentItemsContainer}>
-                <div className="recent-item" style={styles.recentItem}>
-                <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&q=80" alt="Pizza" style={styles.recentThumb} />
-                <div style={styles.recentText}>
-                  <div style={styles.recentTitle}>Yummy pizza night! 🙏🍕</div>
-                  <div style={styles.recentTime}>2h ago</div>
-                </div>
-              </div>
-
-              <div className="recent-item" style={styles.recentItem}>
-                <img src="https://images.unsplash.com/photo-1502933691298-84fc14542831?w=100&q=80" alt="Vegas" style={styles.recentThumb} />
-                <div style={styles.recentText}>
-                  <div style={styles.recentTitle}>Fun night in Vegas! 🎊</div>
-                  <div style={styles.recentTime}>1d ago</div>
-                </div>
-              </div>
-
-              <div className="recent-item" style={styles.recentItem}>
-                <img src="https://images.unsplash.com/photo-1519046904884-53103b34b206?w=100&q=80" alt="Beach" style={styles.recentThumb} />
-                <div style={styles.recentText}>
-                  <div style={styles.recentTitle}>Beautiful beach sunset</div>
-                  <div style={styles.recentTime}>3d ago</div>
-                </div>
-              </div>
-
-              <div className="recent-item" style={styles.recentItem}>
-                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=100&q=80" alt="Coffee" style={styles.recentThumb} />
-                <div style={styles.recentText}>
-                  <div style={styles.recentTitle}>Morning coffee vibes ☕</div>
-                  <div style={styles.recentTime}>5d ago</div>
-                </div>
-              </div>
-
-              <div className="recent-item" style={styles.recentItem}>
-                <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=100&q=80" alt="City lights" style={styles.recentThumb} />
-                <div style={styles.recentText}>
-                  <div style={styles.recentTitle}>City lights adventure 🌃</div>
-                  <div style={styles.recentTime}>1w ago</div>
-                </div>
-              </div>
-
-              {showAllRecent && (
-                <>
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&q=80" alt="Breakfast" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Breakfast goals 🥞</div>
-                      <div style={styles.recentTime}>1w ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=100&q=80" alt="Lake" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Peaceful lake morning 🌅</div>
-                      <div style={styles.recentTime}>2w ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=100&q=80" alt="Burger" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Epic burger night 🍔</div>
-                      <div style={styles.recentTime}>2w ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Portrait" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>New profile pic! 📸</div>
-                      <div style={styles.recentTime}>3w ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&q=80" alt="Dinner" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Homemade pasta night 🍝</div>
-                      <div style={styles.recentTime}>3w ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=100&q=80" alt="Nature" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Hiking adventures 🥾</div>
-                      <div style={styles.recentTime}>1mo ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=100&q=80" alt="Concert" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Amazing concert! 🎸</div>
-                      <div style={styles.recentTime}>1mo ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a?w=100&q=80" alt="Dog" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Best friend forever 🐶</div>
-                      <div style={styles.recentTime}>1mo ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100&q=80" alt="Pizza" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Homemade pizza success 🍕</div>
-                      <div style={styles.recentTime}>2mo ago</div>
-                    </div>
-                  </div>
-
-                  <div className="recent-item" style={styles.recentItem}>
-                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100&q=80" alt="Mountain" style={styles.recentThumb} />
-                    <div style={styles.recentText}>
-                      <div style={styles.recentTitle}>Mountain peak achieved! ⛰️</div>
-                      <div style={styles.recentTime}>2mo ago</div>
-                    </div>
-                  </div>
-                </>
-              )}
-              </div>
-
-              <div style={styles.viewAll}>
-                <a href="#" className="view-all-link" style={styles.viewAllLink} onClick={(e) => { e.preventDefault(); setShowAllRecent(!showAllRecent); }}>
-                  {showAllRecent ? "Show Less" : "View All"}
-                </a>
+                {recentLoading ? (
+                  <div style={styles.recentEmpty}>Loading recent echoes...</div>
+                ) : recentError ? (
+                  <div style={styles.recentEmpty}>{recentError}</div>
+                ) : visibleRecentEchoes.length === 0 ? (
+                  <div style={styles.recentEmpty}>No echoes yet. Create your first memory!</div>
+                ) : (
+                  visibleRecentEchoes.map((snapshot) => {
+                    const firstText = snapshot.items?.find((it) => it.text)?.text || "Saved wall";
+                    const titleText = `${firstText.slice(0, 60)}${firstText.length > 60 ? "…" : ""}`;
+                    const timeLabel = formatTimeAgo(snapshot.updatedAt || snapshot.createdAt);
+                    const thumbInitial = titleText.trim().charAt(0).toUpperCase() || "W";
+                    const countLabel = `${snapshot.items?.length || 0} items`;
+                    return (
+                      <div key={snapshot.id || snapshot.updatedAt || snapshot.createdAt || titleText} className="recent-item" style={styles.recentItem}>
+                        <div style={{...styles.recentThumb, display: "flex", alignItems: "center", justifyContent: "center"}}>
+                          {thumbInitial}
+                        </div>
+                        <div style={styles.recentText}>
+                          <div style={styles.recentTitle}>{titleText || "Saved wall"}</div>
+                          <div style={styles.recentTime}>{timeLabel} • {countLabel}</div>
+                        </div>
+                      </div>
+                    );
+                  })
+                )}
               </div>
             </div>
           </div>

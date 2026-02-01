@@ -1,5 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { pingAuth, getStoredUser } from "../services/authApi";
 
 const Landing = () => {
   const polaroidPhotos = [
@@ -14,6 +15,20 @@ const Landing = () => {
     { img: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300", bottom: "18%", right: "8%", rotate: 6, pinColor: "#7bc9a3", delay: 0.8 },
     { img: "https://images.unsplash.com/photo-1542327897-d73f4005b533?w=300", bottom: "5%", right: "25%", rotate: -12, pinColor: "#d98bb8", delay: 0.9 },
   ];
+
+  const [status, setStatus] = React.useState("Checking backend...");
+  const [userName, setUserName] = React.useState("");
+
+  React.useEffect(() => {
+    const user = getStoredUser();
+    if (user?.name || user?.email) {
+      setUserName(user.name || user.email);
+    }
+
+    pingAuth()
+      .then(() => setStatus("Backend connected"))
+      .catch(() => setStatus("Backend unavailable"));
+  }, []);
 
   const styles = {
     page: {
@@ -99,8 +114,14 @@ const Landing = () => {
     tagline: {
       fontSize: "18px",
       color: "#8b94a8",
-      marginBottom: "40px",
+      marginBottom: "16px",
       lineHeight: 1.6,
+    },
+    status: {
+      fontSize: "13px",
+      color: "#4a5568",
+      marginBottom: "20px",
+      fontWeight: 600,
     },
     button: {
       display: "inline-block",
@@ -227,6 +248,10 @@ const Landing = () => {
           <p style={styles.tagline}>
             A quiet place to<br />pin moments that matter.
           </p>
+          <div style={styles.status}>
+            {status}
+            {userName ? ` • Hello, ${userName.split(" ")[0]}` : ""}
+          </div>
           <Link to="/signin" className="get-started-btn" style={styles.button}>
             Get Started
           </Link>
