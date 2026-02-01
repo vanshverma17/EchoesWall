@@ -545,6 +545,7 @@ const Overview = () => {
     try {
       await deleteWallSnapshot(snapshotId);
       setRecentEchoes((prev) => prev.filter((snap) => (snap.id || snap._id) !== snapshotId));
+      setEchoCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
       setRecentError("Couldn't delete this wall. Please try again.");
     } finally {

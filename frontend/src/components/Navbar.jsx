@@ -173,7 +173,7 @@ const Navbar = () => {
         }
       `}</style>
       <nav style={styles.navbar}>
-        <Link to="/" className="navbar-logo" style={styles.logo}>
+        <Link to="/overview" className="navbar-logo" style={styles.logo}>
           Echoes
         </Link>
         <div style={styles.navLinks}>
