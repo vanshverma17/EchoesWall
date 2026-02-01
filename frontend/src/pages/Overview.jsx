@@ -35,6 +35,7 @@ const Overview = () => {
   const [showAllRecent, setShowAllRecent] = React.useState(false);
   const [searchTerm, setSearchTerm] = React.useState("");
   const [deletingId, setDeletingId] = React.useState("");
+  const [pendingDelete, setPendingDelete] = React.useState(null);
   const styles = {
     page: {
       minHeight: "100vh",
@@ -435,6 +436,62 @@ const Overview = () => {
       width: "calc(100% + 200px)",
       marginLeft: "-200px",
     },
+    modalOverlay: {
+      position: "fixed",
+      inset: 0,
+      background: "rgba(0,0,0,0.35)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      zIndex: 999,
+      padding: "16px",
+    },
+    confirmCard: {
+      background: "#ffffff",
+      borderRadius: "14px",
+      padding: "20px",
+      maxWidth: "360px",
+      width: "100%",
+      boxShadow: "0 12px 32px rgba(0,0,0,0.18)",
+      border: "1px solid rgba(123, 140, 217, 0.25)",
+    },
+    confirmTitle: {
+      fontSize: "18px",
+      fontWeight: 700,
+      color: "#1a202c",
+      marginBottom: "8px",
+    },
+    confirmText: {
+      fontSize: "14px",
+      color: "#4a5568",
+      marginBottom: "16px",
+      lineHeight: 1.5,
+    },
+    confirmActions: {
+      display: "flex",
+      justifyContent: "flex-end",
+      gap: "10px",
+    },
+    confirmCancel: {
+      padding: "8px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(123, 140, 217, 0.25)",
+      background: "#f7fafc",
+      color: "#2d3748",
+      cursor: "pointer",
+      fontWeight: 700,
+      fontSize: "13px",
+    },
+    confirmDelete: {
+      padding: "8px 14px",
+      borderRadius: "10px",
+      border: "1px solid rgba(239, 68, 68, 0.25)",
+      background: "#fef2f2",
+      color: "#c53030",
+      cursor: "pointer",
+      fontWeight: 700,
+      fontSize: "13px",
+    },
   };
 
   React.useEffect(() => {
@@ -476,23 +533,25 @@ const Overview = () => {
     setShowAllRecent(false);
   }, [searchTerm]);
 
-  const handleDeleteSnapshot = React.useCallback(
-    async (snapshotId) => {
-      if (!snapshotId) return;
-      const confirmed = window.confirm("Delete this wall? This cannot be undone.");
-      if (!confirmed) return;
-      setDeletingId(snapshotId);
-      try {
-        await deleteWallSnapshot(snapshotId);
-        setRecentEchoes((prev) => prev.filter((snap) => (snap.id || snap._id) !== snapshotId));
-      } catch (err) {
-        window.alert("Couldn't delete this wall. Please try again.");
-      } finally {
-        setDeletingId("");
-      }
-    },
-    []
-  );
+  const requestDelete = React.useCallback((snapshotId, titleText) => {
+    if (!snapshotId) return;
+    setPendingDelete({ id: snapshotId, title: titleText || "this wall" });
+  }, []);
+
+  const handleDeleteSnapshot = React.useCallback(async () => {
+    const snapshotId = pendingDelete?.id;
+    if (!snapshotId) return;
+    setDeletingId(snapshotId);
+    try {
+      await deleteWallSnapshot(snapshotId);
+      setRecentEchoes((prev) => prev.filter((snap) => (snap.id || snap._id) !== snapshotId));
+    } catch (err) {
+      setRecentError("Couldn't delete this wall. Please try again.");
+    } finally {
+      setDeletingId("");
+      setPendingDelete(null);
+    }
+  }, [pendingDelete]);
 
   const filteredRecentEchoes = React.useMemo(() => {
     const list = Array.isArray(recentEchoes) ? [...recentEchoes] : [];
@@ -797,7 +856,7 @@ const Overview = () => {
                               ...styles.deleteAction,
                               ...(deletingId === snapshotId ? { opacity: 0.6, cursor: "not-allowed" } : {}),
                             }}
-                            onClick={() => handleDeleteSnapshot(snapshotId)}
+                            onClick={() => requestDelete(snapshotId, titleText)}
                             disabled={deletingId === snapshotId}
                           >
                             {deletingId === snapshotId ? "Deleting..." : "Delete"}
@@ -827,6 +886,29 @@ const Overview = () => {
             </div>
           </div>
         </div>
+        {pendingDelete && (
+          <div style={styles.modalOverlay}>
+            <div style={styles.confirmCard}>
+              <div style={styles.confirmTitle}>Delete this wall?</div>
+              <div style={styles.confirmText}>
+                This will permanently remove "{pendingDelete.title}". You cannot undo this action.
+              </div>
+              <div style={styles.confirmActions}>
+                <button style={styles.confirmCancel} onClick={() => setPendingDelete(null)}>Cancel</button>
+                <button
+                  style={{
+                    ...styles.confirmDelete,
+                    ...(deletingId === pendingDelete.id ? { opacity: 0.7, cursor: "not-allowed" } : {}),
+                  }}
+                  onClick={handleDeleteSnapshot}
+                  disabled={deletingId === pendingDelete.id}
+                >
+                  {deletingId === pendingDelete.id ? "Deleting..." : "Delete"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
