@@ -37,6 +37,21 @@ const Navbar = () => {
       textDecoration: "none",
       transition: "color 0.3s ease",
     },
+    profile: {
+      width: "36px",
+      height: "36px",
+      borderRadius: "10px",
+      background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "16px",
+      color: "#ffffff",
+      boxShadow: "0 4px 12px rgba(123, 140, 217, 0.25)",
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+    },
   };
 
   return (
@@ -52,6 +67,11 @@ const Navbar = () => {
         .nav-link:hover {
           color: #7b8cd9;
         }
+        
+        .profile-avatar:hover {
+          transform: translateY(-2px) scale(1.05);
+          box-shadow: 0 6px 16px rgba(123, 140, 217, 0.35);
+        }
       `}</style>
       <nav style={styles.navbar}>
         <Link to="/" className="navbar-logo" style={styles.logo}>
@@ -64,6 +84,9 @@ const Navbar = () => {
           <Link to="/wall" className="nav-link" style={styles.navLink}>
             Wall
           </Link>
+          <div className="profile-avatar" style={styles.profile}>
+            👤
+          </div>
         </div>
       </nav>
     </>

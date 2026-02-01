@@ -10,6 +10,7 @@ const Wall = () => {
   const draggingMetaRef = useRef(null);
   const elRef = useRef(null);
   const [saved, setSaved] = useState(true);
+  const [zoom, setZoom] = useState(1);
 
   const openModal = (type) => {
     setModalType(type);
@@ -63,7 +64,6 @@ const Wall = () => {
   const saveWall = () => {
     localStorage.setItem('echoesWall', JSON.stringify(items));
     setSaved(true);
-    alert('Wall saved successfully!');
   };
 
   const loadWall = () => {
@@ -77,6 +77,18 @@ const Wall = () => {
   React.useEffect(() => {
     loadWall();
   }, []);
+
+  const zoomIn = () => {
+    setZoom(prev => Math.min(prev + 0.1, 2));
+  };
+
+  const zoomOut = () => {
+    setZoom(prev => Math.max(prev - 0.1, 0.5));
+  };
+
+  const resetZoom = () => {
+    setZoom(1);
+  };
 
   const handleMouseDown = (e, id) => {
     if (e.target.tagName === 'BUTTON') return;
@@ -138,20 +150,21 @@ const Wall = () => {
 
   const styles = {
     page: {
-      minHeight: "100vh",
+      height: "100vh",
       width: "100vw",
-      padding: "16px",
+      padding: "8px 16px",
       boxSizing: "border-box",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       background: "linear-gradient(to bottom right, #e8f6ff 0%, #f5fbff 50%, #ffffff 100%)",
       display: "flex",
       flexDirection: "column",
+      overflow: "hidden",
     },
     header: {
       display: "flex",
       justifyContent: "space-between",
       alignItems: "center",
-      marginBottom: "16px",
+      marginBottom: "0px",
     },
     title: {
       fontSize: "32px",
@@ -281,13 +294,14 @@ const Wall = () => {
     },
     canvasWrap: {
       flex: 1,
+      minHeight: 0,
       position: "relative",
       borderRadius: "20px",
       overflow: "auto",
       boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1)",
     },
     canvas: {
-      minHeight: "720px",
+      height: "100%",
       minWidth: "100%",
       position: "relative",
       backgroundImage:
@@ -295,6 +309,50 @@ const Wall = () => {
       backgroundSize: "30px 30px",
       backgroundColor: "#fafcff",
       borderRadius: "20px",
+    },
+    zoomControls: {
+      position: "absolute",
+      bottom: "20px",
+      left: "20px",
+      display: "flex",
+      gap: "8px",
+      background: "rgba(255, 255, 255, 0.95)",
+      backdropFilter: "blur(10px)",
+      padding: "8px",
+      borderRadius: "12px",
+      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
+      zIndex: 50,
+    },
+    zoomBtn: {
+      width: "32px",
+      height: "32px",
+      borderRadius: "8px",
+      border: "1px solid rgba(123, 140, 217, 0.3)",
+      background: "#ffffff",
+      color: "#7b8cd9",
+      cursor: "pointer",
+      fontSize: "16px",
+      fontWeight: 600,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      transition: "all 0.2s ease",
+    },
+    zoomLevel: {
+      padding: "0 8px",
+      fontSize: "13px",
+      fontWeight: 600,
+      color: "#4a5568",
+      display: "flex",
+      alignItems: "center",
+    },
+    canvasContent: {
+      transform: `scale(${zoom})`,
+      transformOrigin: "top left",
+      transition: "transform 0.2s ease",
+      width: "100%",
+      height: "100%",
+      position: "relative",
     },
     polaroid: {
       position: "absolute",
@@ -558,6 +616,12 @@ const Wall = () => {
           border-color: rgba(123, 140, 217, 0.5) !important;
           box-shadow: 0 0 0 3px rgba(123, 140, 217, 0.1) !important;
         }
+        
+        .zoom-btn:hover {
+          background: #7b8cd9 !important;
+          color: #ffffff !important;
+          transform: scale(1.1);
+        }
       `}</style>
       
       <div style={styles.page}>
@@ -620,7 +684,8 @@ const Wall = () => {
 
         <div style={styles.canvasWrap}>
           <div className="canvas-area" style={styles.canvas} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
-            {items.map((it) => {
+            <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
+              {items.map((it) => {
               if (it.type === "note") {
                 return (
                   <div key={it.id} className="sticky-note" style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
@@ -665,6 +730,21 @@ const Wall = () => {
 
               return null;
             })}
+            </div>
+            
+            {/* Zoom Controls */}
+            <div style={styles.zoomControls}>
+              <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomOut} title="Zoom Out">
+                −
+              </button>
+              <div style={styles.zoomLevel}>{Math.round(zoom * 100)}%</div>
+              <button className="zoom-btn" style={styles.zoomBtn} onClick={resetZoom} title="Reset Zoom">
+                ⟲
+              </button>
+              <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomIn} title="Zoom In">
+                +
+              </button>
+            </div>
           </div>
         </div>
 

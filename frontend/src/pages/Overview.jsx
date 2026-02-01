@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 
 const Overview = () => {
   const navigate = useNavigate();
+  const [showAllRecent, setShowAllRecent] = React.useState(false);
   const styles = {
     page: {
       minHeight: "100vh",
@@ -95,7 +96,7 @@ const Overview = () => {
     },
     mainContent: {
       display: "grid",
-      gridTemplateColumns: "1fr 320px",
+      gridTemplateColumns: "1fr 400px",
       gap: "20px",
       alignItems: "stretch",
       height: "calc(100vh - 140px)",
@@ -108,11 +109,13 @@ const Overview = () => {
       boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04)",
       position: "relative",
       border: "none",
+      width: "80%",
     },
     board: {
       background: "linear-gradient(to bottom, #fafbff 0%, #f0f3f9 100%)",
       borderRadius: "14px",
       height: "100%",
+      width: "100%",
       position: "relative",
       overflow: "hidden",
       boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1), 0 8px 32px rgba(123, 140, 217, 0.15), inset 0 2px 8px rgba(123, 140, 217, 0.05)",
@@ -202,25 +205,38 @@ const Overview = () => {
     newMemoryTall: {
       background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
       color: "#fff",
-      borderRadius: "12px",
+      borderRadius: "10px",
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      fontSize: "15px",
-      fontWeight: 600,
-      padding: "12px 24px",
+      fontSize: "20px",
+      fontWeight: 300,
+      width: "40px",
+      height: "37px",
+      minWidth: "40px",
+      minHeight: "37px",
+      padding: 0,
       boxShadow: "0 4px 16px rgba(123, 140, 217, 0.25)",
       border: "none",
       cursor: "pointer",
       transition: "all 0.3s ease",
     },
     sidebarCard: {
+      width: "calc(100% + 200px)",
+      marginLeft: "-200px",
       background: "rgba(255, 255, 255, 0.8)",
       backdropFilter: "blur(20px)",
       borderRadius: "16px",
       padding: "18px",
       boxShadow: "0 3px 16px rgba(123, 140, 217, 0.08), 0 1px 3px rgba(0, 0, 0, 0.04)",
       border: "none",
+      display: "flex",
+      flexDirection: "column",
+    },
+    recentItemsContainer: {
+      maxHeight: "400px",
+      overflowY: "auto",
+      marginBottom: "8px",
     },
     sidebarHeader: {
       display: "flex",
@@ -311,6 +327,26 @@ const Overview = () => {
       boxShadow: "0 3px 10px rgba(123, 140, 217, 0.2)",
       transition: "all 0.3s ease",
     },
+    searchBar: {
+      width: "100%",
+      padding: "10px 16px",
+      borderRadius: "10px",
+      border: "1px solid rgba(123, 140, 217, 0.2)",
+      fontSize: "13px",
+      fontFamily: "inherit",
+      outline: "none",
+      background: "rgba(255, 255, 255, 0.8)",
+      color: "#2d3748",
+      transition: "all 0.3s ease",
+      boxSizing: "border-box",
+    },
+    searchContainer: {
+      display: "flex",
+      gap: "10px",
+      alignItems: "center",
+      width: "calc(100% + 200px)",
+      marginLeft: "-200px",
+    },
   };
 
   return (
@@ -376,6 +412,11 @@ const Overview = () => {
           box-shadow: 0 6px 20px rgba(123, 140, 217, 0.35) !important;
         }
         
+        .search-bar:focus {
+          border-color: rgba(123, 140, 217, 0.5) !important;
+          box-shadow: 0 0 0 3px rgba(123, 140, 217, 0.1) !important;
+        }
+        
         ::placeholder {
           color: #a0aec0;
         }
@@ -405,10 +446,6 @@ const Overview = () => {
           {/* Welcome Section */}
           <div style={styles.welcomeSection}>
             <h2 style={styles.welcomeText}>Welcome back, Alex!</h2>
-          </div>
-          
-          <div style={styles.rightSection}>
-            <div style={styles.avatar}>👤</div>
           </div>
         </div>
 
@@ -486,32 +523,54 @@ const Overview = () => {
 
               {/* Camera */}
               <div className="camera-icon" style={styles.camera}>
-                <span>📷</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                  <circle cx="12" cy="13" r="4"></circle>
+                </svg>
                 <span style={styles.cameraText}>Board Camera</span>
               </div>
 
               {/* Edit Button */}
               <button className="edit-btn" style={styles.editButton}>
-                ✏️ Edit Board
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Edit Board
               </button>
             </div>
           </div>
 
           {/* Sidebar */}
           <div style={styles.sidebar}>
-            {/* Tall New Memory button matching board height */}
-            <button style={styles.newMemoryTall} onClick={() => navigate('/wall')} aria-label="Create New Memory">
-              + New Memory
-            </button>
+            {/* Search Bar with New Memory Button */}
+            <div style={styles.searchContainer}>
+              <button style={styles.newMemoryTall} onClick={() => navigate('/wall')} aria-label="Create New Memory">
+                +
+              </button>
+              <input
+                type="text"
+                className="search-bar"
+                style={styles.searchBar}
+                placeholder="Search memories..."
+              />
+            </div>
 
             {/* Recent Section */}
             <div style={styles.sidebarCard}>
               <div style={styles.sidebarHeader}>
                 <div style={styles.sidebarTitle}>Recent</div>
-                <button className="icon-btn" style={{...styles.iconButton, fontSize: "16px", width: "32px", height: "32px"}}>⋯</button>
+                <button className="icon-btn" style={{...styles.iconButton, fontSize: "16px", width: "32px", height: "32px"}}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="1.5"></circle>
+                    <circle cx="12" cy="6" r="1.5"></circle>
+                    <circle cx="12" cy="18" r="1.5"></circle>
+                  </svg>
+                </button>
               </div>
 
-              <div className="recent-item" style={styles.recentItem}>
+              <div style={styles.recentItemsContainer}>
+                <div className="recent-item" style={styles.recentItem}>
                 <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=100&q=80" alt="Pizza" style={styles.recentThumb} />
                 <div style={styles.recentText}>
                   <div style={styles.recentTitle}>Yummy pizza night! 🙏🍕</div>
@@ -535,8 +594,111 @@ const Overview = () => {
                 </div>
               </div>
 
+              <div className="recent-item" style={styles.recentItem}>
+                <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?w=100&q=80" alt="Coffee" style={styles.recentThumb} />
+                <div style={styles.recentText}>
+                  <div style={styles.recentTitle}>Morning coffee vibes ☕</div>
+                  <div style={styles.recentTime}>5d ago</div>
+                </div>
+              </div>
+
+              <div className="recent-item" style={styles.recentItem}>
+                <img src="https://images.unsplash.com/photo-1511632765486-a01980e01a18?w=100&q=80" alt="City lights" style={styles.recentThumb} />
+                <div style={styles.recentText}>
+                  <div style={styles.recentTitle}>City lights adventure 🌃</div>
+                  <div style={styles.recentTime}>1w ago</div>
+                </div>
+              </div>
+
+              {showAllRecent && (
+                <>
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1551963831-b3b1ca40c98e?w=100&q=80" alt="Breakfast" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Breakfast goals 🥞</div>
+                      <div style={styles.recentTime}>1w ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=100&q=80" alt="Lake" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Peaceful lake morning 🌅</div>
+                      <div style={styles.recentTime}>2w ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=100&q=80" alt="Burger" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Epic burger night 🍔</div>
+                      <div style={styles.recentTime}>2w ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100&q=80" alt="Portrait" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>New profile pic! 📸</div>
+                      <div style={styles.recentTime}>3w ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=100&q=80" alt="Dinner" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Homemade pasta night 🍝</div>
+                      <div style={styles.recentTime}>3w ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1469474968028-56623f02e42e?w=100&q=80" alt="Nature" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Hiking adventures 🥾</div>
+                      <div style={styles.recentTime}>1mo ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1527529482837-4698179dc6ce?w=100&q=80" alt="Concert" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Amazing concert! 🎸</div>
+                      <div style={styles.recentTime}>1mo ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1517849845537-4d257902454a?w=100&q=80" alt="Dog" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Best friend forever 🐶</div>
+                      <div style={styles.recentTime}>1mo ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=100&q=80" alt="Pizza" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Homemade pizza success 🍕</div>
+                      <div style={styles.recentTime}>2mo ago</div>
+                    </div>
+                  </div>
+
+                  <div className="recent-item" style={styles.recentItem}>
+                    <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=100&q=80" alt="Mountain" style={styles.recentThumb} />
+                    <div style={styles.recentText}>
+                      <div style={styles.recentTitle}>Mountain peak achieved! ⛰️</div>
+                      <div style={styles.recentTime}>2mo ago</div>
+                    </div>
+                  </div>
+                </>
+              )}
+              </div>
+
               <div style={styles.viewAll}>
-                <a href="#" className="view-all-link" style={styles.viewAllLink}>View All</a>
+                <a href="#" className="view-all-link" style={styles.viewAllLink} onClick={(e) => { e.preventDefault(); setShowAllRecent(!showAllRecent); }}>
+                  {showAllRecent ? "Show Less" : "View All"}
+                </a>
               </div>
             </div>
           </div>
