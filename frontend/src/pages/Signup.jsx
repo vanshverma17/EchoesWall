@@ -1,9 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { signup } from "../services/authApi";
 
 const Signup = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const polaroidPhotos = [
     { img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300", top: "8%", left: "5%", rotate: -8, pinColor: "#7ba3d9" },
@@ -214,6 +221,30 @@ const Signup = () => {
       fontWeight: 500,
       marginLeft: 4,
     },
+    status: {
+      marginTop: 12,
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#4a5568",
+    },
+    error: {
+      color: "#d14343",
+    },
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("");
+    setLoading(true);
+    try {
+      await signup({ name, email, password });
+      setStatus("Account created! Redirecting to sign in...");
+      setTimeout(() => navigate("/signin"), 500);
+    } catch (err) {
+      setStatus(err.message || "Signup failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -259,7 +290,7 @@ const Signup = () => {
           <h2 id="signup-heading" style={styles.heading}>Sign Up</h2>
           <div style={styles.sub}>Create your account below</div>
 
-          <form aria-label="Sign up form">
+          <form aria-label="Sign up form" onSubmit={handleSubmit}>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="fullname">
                 <span style={styles.icon}>👤</span> Full Name
@@ -269,7 +300,10 @@ const Signup = () => {
                 name="fullname" 
                 type="text" 
                 placeholder="Enter your full name" 
-                style={styles.input} 
+                style={styles.input}
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
               />
             </div>
 
@@ -282,7 +316,10 @@ const Signup = () => {
                 name="email" 
                 type="email" 
                 placeholder="Enter your email" 
-                style={styles.input} 
+                style={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -295,16 +332,26 @@ const Signup = () => {
                 name="password" 
                 type="password" 
                 placeholder="Enter your password" 
-                style={styles.input} 
+                style={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
-            <button type="submit" style={styles.button}>Sign Up</button>
+            <button type="submit" style={styles.button} disabled={loading}>
+              {loading ? "Connecting..." : "Sign Up"}
+            </button>
+            {status && (
+              <div style={{ ...styles.status, ...(status.toLowerCase().includes("fail") || status.toLowerCase().includes("error") || status.toLowerCase().includes("already") ? styles.error : {}) }}>
+                {status}
+              </div>
+            )}
           </form>
 
           <div style={styles.footer}>
             Already have an account?
-            <Link to="/" style={styles.createLink}>Sign in</Link>
+            <Link to="/signin" style={styles.createLink}>Sign in</Link>
           </div>
         </div>
       </div>

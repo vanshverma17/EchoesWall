@@ -1,9 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { login } from "../services/authApi";
 
 const Signin = () => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isHovered, setIsHovered] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const polaroidPhotos = [
     { img: "https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=300", top: "8%", left: "5%", rotate: -8, pinColor: "#7ba3d9" },
@@ -223,6 +229,30 @@ const Signin = () => {
       fontWeight: 500,
       marginLeft: 4,
     },
+    status: {
+      marginTop: 12,
+      fontSize: 13,
+      fontWeight: 600,
+      color: "#4a5568",
+    },
+    error: {
+      color: "#d14343",
+    },
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setStatus("");
+    setLoading(true);
+    try {
+      await login({ email, password });
+      setStatus("Connected! Redirecting...");
+      setTimeout(() => navigate("/overview"), 400);
+    } catch (err) {
+      setStatus(err.message || "Login failed");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -268,7 +298,7 @@ const Signin = () => {
           <h2 id="signin-heading" style={styles.heading}>Sign In</h2>
           <div style={styles.sub}>Enter your information below</div>
 
-          <form aria-label="Sign in form">
+          <form aria-label="Sign in form" onSubmit={handleSubmit}>
             <div style={styles.field}>
               <label style={styles.label} htmlFor="email">
                 <span style={styles.icon}>✉</span> Email
@@ -278,7 +308,10 @@ const Signin = () => {
                 name="email" 
                 type="email" 
                 placeholder="Enter your email" 
-                style={styles.input} 
+                style={styles.input}
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -291,12 +324,22 @@ const Signin = () => {
                 name="password" 
                 type="password" 
                 placeholder="Enter your password" 
-                style={styles.input} 
+                style={styles.input}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
               />
               <a href="#" style={styles.forgotLink}>Forgot password?</a>
             </div>
 
-            <button type="submit" style={styles.button}>Sign In</button>
+            <button type="submit" style={styles.button} disabled={loading}>
+              {loading ? "Connecting..." : "Sign In"}
+            </button>
+            {status && (
+              <div style={{ ...styles.status, ...(status.toLowerCase().includes("fail") || status.toLowerCase().includes("invalid") ? styles.error : {}) }}>
+                {status}
+              </div>
+            )}
           </form>
 
           <div style={styles.footer}>

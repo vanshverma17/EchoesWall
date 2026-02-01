@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { fetchEchoes, saveEchoes, deleteAllEchoes } from "../services/echoesApi";
 
 const Wall = () => {
   const [items, setItems] = useState([]);
@@ -12,6 +13,9 @@ const Wall = () => {
   const elRef = useRef(null);
   const [saved, setSaved] = useState(true);
   const [zoom, setZoom] = useState(1);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState("");
 
   const openModal = (type) => {
     setModalType(type);
@@ -71,26 +75,59 @@ const Wall = () => {
     setSaved(false);
   };
   
-  const clearAll = () => {
-    if (window.confirm("Clear all items from the wall?")) {
-      setItems([]);
-      setSaved(false);
+  const clearAll = async () => {
+    if (!window.confirm("Clear all items from the wall?")) {
+      return;
+    }
+
+    setItems([]);
+    setSaved(false);
+    setSaving(true);
+    setError("");
+
+    try {
+      await deleteAllEchoes();
+      setSaved(true);
+    } catch (err) {
+      console.error(err);
+      setError("Could not clear the wall. Please try again.");
+    } finally {
+      setSaving(false);
     }
   };
 
   const pinColors = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
   const getRandomPinColor = () => pinColors[Math.floor(Math.random() * pinColors.length)];
 
-  const saveWall = () => {
-    localStorage.setItem('echoesWall', JSON.stringify(items));
-    setSaved(true);
+  const saveWall = async () => {
+    setSaving(true);
+    setError("");
+    try {
+      const persisted = await saveEchoes(items);
+      setItems(persisted);
+      setSaved(true);
+    } catch (err) {
+      console.error(err);
+      setError("Saving failed. Please try again.");
+      setSaved(false);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  const loadWall = () => {
-    const saved = localStorage.getItem('echoesWall');
-    if (saved) {
-      setItems(JSON.parse(saved));
+  const loadWall = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const existing = await fetchEchoes();
+      setItems(existing);
       setSaved(true);
+    } catch (err) {
+      console.error(err);
+      setError("Unable to load your wall right now.");
+      setSaved(false);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -320,6 +357,20 @@ const Wall = () => {
       alignItems: "center",
       gap: "6px",
     },
+    statusRow: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      flexWrap: "wrap",
+    },
+    errorBanner: {
+      padding: "8px 12px",
+      borderRadius: "12px",
+      background: "rgba(239, 107, 107, 0.12)",
+      color: "#d14343",
+      fontSize: "12px",
+      fontWeight: 600,
+    },
     canvasWrap: {
       flex: 1,
       minHeight: 0,
@@ -340,6 +391,12 @@ const Wall = () => {
       backgroundSize: "30px 30px",
       backgroundColor: "#fafcff",
       borderRadius: "20px",
+    },
+    loadingState: {
+      padding: "24px",
+      textAlign: "center",
+      color: "#4a5568",
+      fontWeight: 600,
     },
     zoomControls: {
       position: "absolute",
@@ -739,9 +796,14 @@ const Wall = () => {
         </div>
 
         <div style={styles.header}>
-          <div style={{display: 'flex', alignItems: 'center', gap: '16px'}}>
+          <div style={styles.statusRow}>
             <h2 style={styles.title}>Create Your Wall</h2>
-            {saved ? (
+            {saving ? (
+              <div style={styles.unsavedIndicator}>
+                <span>●</span>
+                Saving...
+              </div>
+            ) : saved ? (
               <div style={styles.savedIndicator}>
                 <span>✓</span>
                 Saved
@@ -752,57 +814,68 @@ const Wall = () => {
                 Unsaved changes
               </div>
             )}
+            {loading && (
+              <div style={styles.unsavedIndicator}>
+                <span>●</span>
+                Loading...
+              </div>
+            )}
           </div>
+          {error && <div style={styles.errorBanner}>{error}</div>}
         </div>
 
         <div style={styles.canvasWrap}>
           <div className="canvas-area" style={styles.canvas} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
             <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
-              {items.map((it) => {
-              if (it.type === "note") {
-                return (
-                  <div key={it.id} className="sticky-note" style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
-                    <div style={{...styles.pin, background: getRandomPinColor()}}>
-                      <div style={styles.pinNeedle}></div>
+              {loading ? (
+                <div style={styles.loadingState}>Loading your wall...</div>
+              ) : (
+                items.map((it) => {
+                if (it.type === "note") {
+                  return (
+                    <div key={it.id} className="sticky-note" style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                      <div style={{...styles.pin, background: getRandomPinColor()}}>
+                        <div style={styles.pinNeedle}></div>
+                      </div>
+                      <div style={styles.stickyText}>{it.text}</div>
+                      <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <div style={styles.stickyText}>{it.text}</div>
-                    <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              if (it.type === "thought") {
-                return (
-                  <div key={it.id} className="cloud" style={{...styles.cloud, background: it.color || "#ffffff", top: it.top, left: it.left}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
-                    <div style={{...styles.pin, background: getRandomPinColor()}}>
-                      <div style={styles.pinNeedle}></div>
+                if (it.type === "thought") {
+                  return (
+                    <div key={it.id} className="cloud" style={{...styles.cloud, background: it.color || "#ffffff", top: it.top, left: it.left}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                      <div style={{...styles.pin, background: getRandomPinColor()}}>
+                        <div style={styles.pinNeedle}></div>
+                      </div>
+                      <div style={styles.cloudText}>{it.text}</div>
+                      <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <div style={styles.cloudText}>{it.text}</div>
-                    <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              if (it.type === "image") {
-                return (
-                  <div key={it.id} className="polaroid" style={{...styles.polaroid, top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
-                    <div style={{...styles.pin, background: getRandomPinColor()}}>
-                      <div style={styles.pinNeedle}></div>
+                if (it.type === "image") {
+                  return (
+                    <div key={it.id} className="polaroid" style={{...styles.polaroid, top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                      <div style={{...styles.pin, background: getRandomPinColor()}}>
+                        <div style={styles.pinNeedle}></div>
+                      </div>
+                      <img src={it.src} alt="memory" style={styles.polaroidImg} />
+                      <button style={styles.deleteBtn} onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <img src={it.src} alt="memory" style={styles.polaroidImg} />
-                    <button style={styles.deleteBtn} onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              return null;
-            })}
+                return null;
+              })
+              )}
             </div>
             
             {/* Zoom Controls */}
