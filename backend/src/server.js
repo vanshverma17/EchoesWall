@@ -46,6 +46,9 @@ const echoItemSchema = new mongoose.Schema(
 const wallSnapshotSchema = new mongoose.Schema(
   {
     items: { type: [echoItemSchema], default: [] },
+    ownerId: { type: String, required: true, index: true },
+    ownerEmail: { type: String, required: true, lowercase: true, trim: true },
+    ownerName: { type: String, required: true, trim: true },
   },
   {
     collection: "wallSnapshots",
@@ -167,18 +170,26 @@ app.post("/api/auth/login", async (req, res, next) => {
   }
 });
 
-app.get("/api/walls", async (_req, res, next) => {
+app.get("/api/walls", async (req, res, next) => {
   try {
-    const walls = await WallSnapshot.find({}).sort({ updatedAt: -1 });
-    res.json(walls);
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const walls = await WallSnapshot.find({ ownerId: userId }).sort({ updatedAt: -1 });
+    res.json(walls.map(attachItemIds));
   } catch (err) {
     next(err);
   }
 });
 
-app.get("/api/walls/latest", async (_req, res, next) => {
+app.get("/api/walls/latest", async (req, res, next) => {
   try {
-    const latest = await WallSnapshot.findOne({}).sort({ updatedAt: -1 });
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const latest = await WallSnapshot.findOne({ ownerId: userId }).sort({ updatedAt: -1 });
     if (!latest) {
       return res.json({ items: [] });
     }
@@ -191,7 +202,11 @@ app.get("/api/walls/latest", async (_req, res, next) => {
 app.get("/api/walls/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const wall = await WallSnapshot.findById(id);
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const wall = await WallSnapshot.findOne({ _id: id, ownerId: userId });
     if (!wall) {
       return res.status(404).json({ message: "Wall not found" });
     }
@@ -203,14 +218,22 @@ app.get("/api/walls/:id", async (req, res, next) => {
 
 app.post("/api/walls", async (req, res, next) => {
   try {
-    const { items } = req.body || {};
+    const { items, userId, userEmail, userName } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
+    }
+    if (!userId || !userEmail || !userName) {
+      return res.status(400).json({ message: "userId, userEmail, and userName are required" });
     }
 
     const sanitized = sanitizeItems(items);
 
-    const wall = await WallSnapshot.create({ items: sanitized });
+    const wall = await WallSnapshot.create({
+      items: sanitized,
+      ownerId: userId,
+      ownerEmail: userEmail.trim().toLowerCase(),
+      ownerName: userName.trim(),
+    });
     res.status(201).json(attachItemIds(wall));
   } catch (err) {
     next(err);
@@ -220,15 +243,22 @@ app.post("/api/walls", async (req, res, next) => {
 app.put("/api/walls/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { items } = req.body || {};
+    const { items, userId, userEmail, userName } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
     }
+    if (!userId || !userEmail || !userName) {
+      return res.status(400).json({ message: "userId, userEmail, and userName are required" });
+    }
 
     const sanitized = sanitizeItems(items);
-    const wall = await WallSnapshot.findByIdAndUpdate(
-      id,
-      { items: sanitized },
+    const wall = await WallSnapshot.findOneAndUpdate(
+      { _id: id, ownerId: userId },
+      {
+        items: sanitized,
+        ownerEmail: userEmail.trim().toLowerCase(),
+        ownerName: userName.trim(),
+      },
       { new: true, runValidators: true }
     );
 
@@ -254,7 +284,11 @@ app.delete("/api/walls", async (_req, res, next) => {
 app.delete("/api/walls/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const removed = await WallSnapshot.findByIdAndDelete(id);
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const removed = await WallSnapshot.findOneAndDelete({ _id: id, ownerId: userId });
     if (!removed) {
       return res.status(404).json({ message: "Wall not found" });
     }
@@ -265,9 +299,13 @@ app.delete("/api/walls/:id", async (req, res, next) => {
 });
 
 // Back-compat routes for older clients expecting /api/echoes
-app.get("/api/echoes", async (_req, res, next) => {
+app.get("/api/echoes", async (req, res, next) => {
   try {
-    const latest = await WallSnapshot.findOne({}).sort({ updatedAt: -1 });
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    const latest = await WallSnapshot.findOne({ ownerId: userId }).sort({ updatedAt: -1 });
     if (!latest) {
       return res.json([]);
     }
@@ -280,13 +318,21 @@ app.get("/api/echoes", async (_req, res, next) => {
 
 app.put("/api/echoes", async (req, res, next) => {
   try {
-    const { items } = req.body || {};
+    const { items, userId, userEmail, userName } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
     }
+    if (!userId || !userEmail || !userName) {
+      return res.status(400).json({ message: "userId, userEmail, and userName are required" });
+    }
 
     const sanitized = sanitizeItems(items);
-    const wall = await WallSnapshot.create({ items: sanitized });
+    const wall = await WallSnapshot.create({
+      items: sanitized,
+      ownerId: userId,
+      ownerEmail: userEmail.trim().toLowerCase(),
+      ownerName: userName.trim(),
+    });
     const snapshot = attachItemIds(wall);
     res.json(snapshot.items || []);
   } catch (err) {
@@ -294,9 +340,13 @@ app.put("/api/echoes", async (req, res, next) => {
   }
 });
 
-app.delete("/api/echoes", async (_req, res, next) => {
+app.delete("/api/echoes", async (req, res, next) => {
   try {
-    await WallSnapshot.deleteMany({});
+    const { userId } = req.query;
+    if (!userId) {
+      return res.status(400).json({ message: "userId is required" });
+    }
+    await WallSnapshot.deleteMany({ ownerId: userId });
     res.status(204).send();
   } catch (err) {
     next(err);

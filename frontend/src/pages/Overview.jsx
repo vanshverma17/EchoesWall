@@ -504,12 +504,13 @@ const Overview = () => {
 
   React.useEffect(() => {
     const loadEchoes = async () => {
+      const user = getStoredUser();
       setEchoLoading(true);
       setEchoError("");
       setRecentLoading(true);
       setRecentError("");
       try {
-        const snapshots = await fetchEchoes({ history: true });
+        const snapshots = await fetchEchoes({ history: true, userId: user?.id });
         setEchoCount(snapshots.length);
         setRecentEchoes(
           [...snapshots].sort(
@@ -543,10 +544,12 @@ const Overview = () => {
     if (!snapshotId) return;
     setDeletingId(snapshotId);
     try {
-      await deleteWallSnapshot(snapshotId);
+      const user = getStoredUser();
+      await deleteWallSnapshot(snapshotId, { userId: user?.id });
       setRecentEchoes((prev) => prev.filter((snap) => (snap.id || snap._id) !== snapshotId));
       setEchoCount((prev) => Math.max(0, prev - 1));
     } catch (err) {
+      console.error(err);
       setRecentError("Couldn't delete this wall. Please try again.");
     } finally {
       setDeletingId("");

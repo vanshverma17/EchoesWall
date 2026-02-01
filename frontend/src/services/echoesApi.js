@@ -31,11 +31,17 @@ const normalizeSnapshot = (doc = {}) => ({
 });
 
 export const fetchEchoes = async (options = {}) => {
-  const { signal, history = false } = options;
+  const { signal, history = false, userId } = options;
+
+  if (!userId) {
+    return history ? [] : [];
+  }
 
   if (history) {
     try {
-      const data = await handleResponse(await fetch(`${API_BASE_URL}/api/walls`, { signal }));
+      const data = await handleResponse(
+        await fetch(`${API_BASE_URL}/api/walls?userId=${encodeURIComponent(userId)}`, { signal })
+      );
       return Array.isArray(data) ? data.map(normalizeSnapshot) : [];
     } catch {
       // Fallback for servers that don't expose /api/walls
@@ -52,32 +58,39 @@ export const fetchEchoes = async (options = {}) => {
   }
 
   try {
-    const latest = await handleResponse(await fetch(`${API_BASE_URL}/api/walls/latest`, { signal }));
+    const latest = await handleResponse(
+      await fetch(`${API_BASE_URL}/api/walls/latest?userId=${encodeURIComponent(userId)}`, { signal })
+    );
     const normalized = normalizeSnapshot(latest || {});
     return normalized.items;
   } catch {
     // Fallback to legacy echoes list
-    const latestEchoes = await handleResponse(await fetch(`${API_BASE_URL}/api/echoes`, { signal }));
+    const latestEchoes = await handleResponse(
+      await fetch(`${API_BASE_URL}/api/echoes?userId=${encodeURIComponent(userId)}`, { signal })
+    );
     return Array.isArray(latestEchoes) ? latestEchoes.map(normalizeEcho) : [];
   }
 };
 
 export const fetchWallSnapshot = async (id, options = {}) => {
-  const { signal } = options;
-  const data = await handleResponse(await fetch(`${API_BASE_URL}/api/walls/${id}`, { signal }));
+  const { signal, userId } = options;
+  const data = await handleResponse(
+    await fetch(`${API_BASE_URL}/api/walls/${id}?userId=${encodeURIComponent(userId || "")}`, { signal })
+  );
   return normalizeSnapshot(data || {});
 };
 
-export const deleteWallSnapshot = async (id) => {
+export const deleteWallSnapshot = async (id, options = {}) => {
+  const { userId } = options;
   await handleResponse(
-    await fetch(`${API_BASE_URL}/api/walls/${id}`, {
+    await fetch(`${API_BASE_URL}/api/walls/${id}?userId=${encodeURIComponent(userId || "")}`, {
       method: "DELETE",
     })
   );
 };
 
 export const saveEchoes = async (items = [], options = {}) => {
-  const { wallId } = options;
+  const { wallId, user } = options;
   const payload = {
     items: items.map(({ type, text, src, color, top, left }) => ({
       type,
@@ -87,6 +100,9 @@ export const saveEchoes = async (items = [], options = {}) => {
       top,
       left,
     })),
+    userId: user?.id,
+    userEmail: user?.email,
+    userName: user?.name,
   };
 
   const endpoint = wallId ? `${API_BASE_URL}/api/walls/${wallId}` : `${API_BASE_URL}/api/walls`;
@@ -121,9 +137,10 @@ export const saveEchoes = async (items = [], options = {}) => {
   }
 };
 
-export const deleteAllEchoes = async () => {
+export const deleteAllEchoes = async (options = {}) => {
+  const { userId } = options;
   await handleResponse(
-    await fetch(`${API_BASE_URL}/api/walls`, {
+    await fetch(`${API_BASE_URL}/api/walls?userId=${encodeURIComponent(userId || "")}`, {
       method: "DELETE",
     })
   );

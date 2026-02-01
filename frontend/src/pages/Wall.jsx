@@ -1,9 +1,9 @@
 import React, { useState, useRef } from "react";
-
-const PIN_COLORS = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
 import { useLocation, useParams } from "react-router-dom";
 import { fetchEchoes, saveEchoes, deleteAllEchoes, fetchWallSnapshot } from "../services/echoesApi";
 import { getStoredUser } from "../services/authApi";
+
+const PIN_COLORS = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
 
 const Wall = ({ isNew = false }) => {
   const location = useLocation();
@@ -71,7 +71,6 @@ const Wall = ({ isNew = false }) => {
         left: `${left}px`,
         ...(modalType === "image" ? { src: formData.url } : { text: formData.text, color: formData.color })
       };
-      
       setItems((s) => [...s, newItem]);
       setSaved(false);
       closeModal();
@@ -82,7 +81,7 @@ const Wall = ({ isNew = false }) => {
     setItems((s) => s.filter((i) => i.id !== id));
     setSaved(false);
   };
-  
+
   const clearAll = async () => {
     if (!window.confirm("Clear all items from the wall?")) {
       return;
@@ -94,7 +93,8 @@ const Wall = ({ isNew = false }) => {
     setError("");
 
     try {
-      await deleteAllEchoes();
+      const user = getStoredUser();
+      await deleteAllEchoes({ userId: user?.id });
       setSaved(true);
     } catch (err) {
       console.error(err);
@@ -109,6 +109,7 @@ const Wall = ({ isNew = false }) => {
   }, []);
 
   const saveWall = async () => {
+    const user = getStoredUser();
     setSaving(true);
     setError("");
     try {
@@ -118,7 +119,10 @@ const Wall = ({ isNew = false }) => {
           ...it,
           id: it.id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
         }));
-      const persisted = await saveEchoes(cleanedItems, { wallId: wallId && !isNewWall ? wallId : undefined });
+      const persisted = await saveEchoes(cleanedItems, {
+        wallId: wallId && !isNewWall ? wallId : undefined,
+        user,
+      });
       setItems(persisted);
       setSaved(true);
     } catch (err) {
@@ -131,6 +135,7 @@ const Wall = ({ isNew = false }) => {
   };
 
   const loadWall = React.useCallback(async () => {
+    const user = getStoredUser();
     setLoading(true);
     setError("");
     const controller = new AbortController();
@@ -138,10 +143,10 @@ const Wall = ({ isNew = false }) => {
     try {
       let existing;
       if (wallId && !isNewWall) {
-        const snapshot = await fetchWallSnapshot(wallId, { signal: controller.signal });
+        const snapshot = await fetchWallSnapshot(wallId, { signal: controller.signal, userId: user?.id });
         existing = snapshot.items || [];
       } else {
-        existing = await fetchEchoes({ signal: controller.signal });
+        existing = await fetchEchoes({ signal: controller.signal, userId: user?.id });
       }
       const normalized = Array.isArray(existing)
         ? existing
@@ -179,7 +184,7 @@ const Wall = ({ isNew = false }) => {
     }
 
     loadWall();
-  }, [isNewWall, loadWall]);
+  }, [isNewWall, wallId, loadWall]);
 
   const zoomIn = () => {
     setZoom(prev => Math.min(prev + 0.1, 2));
