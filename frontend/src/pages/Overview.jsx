@@ -93,13 +93,14 @@ const Overview = () => {
       display: "grid",
       gridTemplateColumns: "1fr 320px",
       gap: "20px",
-      alignItems: "start",
+      alignItems: "stretch",
+      height: "calc(100vh - 140px)",
     },
     boardContainer: {
       background: "rgba(255, 255, 255, 0.7)",
       backdropFilter: "blur(20px)",
       borderRadius: "20px",
-      padding: "0",
+      padding: "24px",
       boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04)",
       position: "relative",
       border: "none",
@@ -107,7 +108,7 @@ const Overview = () => {
     board: {
       background: "linear-gradient(to bottom, #fafbff 0%, #f0f3f9 100%)",
       borderRadius: "14px",
-      minHeight: "600px",
+      height: "100%",
       position: "relative",
       overflow: "hidden",
       boxShadow: "inset 0 2px 8px rgba(123, 140, 217, 0.05)",
@@ -172,7 +173,7 @@ const Overview = () => {
     },
     editButton: {
       position: "absolute",
-      bottom: "-18px",
+      bottom: "18px",
       left: "50%",
       transform: "translateX(-50%)",
       background: "#ffffff",
@@ -193,6 +194,21 @@ const Overview = () => {
       display: "flex",
       flexDirection: "column",
       gap: "20px",
+    },
+    newMemoryTall: {
+      background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
+      color: "#fff",
+      borderRadius: "12px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      fontSize: "15px",
+      fontWeight: 600,
+      padding: "12px 24px",
+      boxShadow: "0 4px 16px rgba(123, 140, 217, 0.25)",
+      border: "none",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
     },
     sidebarCard: {
       background: "rgba(255, 255, 255, 0.8)",
@@ -389,10 +405,6 @@ const Overview = () => {
           
           <div style={styles.rightSection}>
             <div style={styles.avatar}>👤</div>
-            <button style={styles.newMemoryBtn}>
-              <span>+</span>
-              New Memory
-            </button>
           </div>
         </div>
 
@@ -483,6 +495,11 @@ const Overview = () => {
 
           {/* Sidebar */}
           <div style={styles.sidebar}>
+            {/* Tall New Memory button matching board height */}
+            <button style={styles.newMemoryTall} aria-label="Create New Memory">
+              + New Memory
+            </button>
+
             {/* Recent Section */}
             <div style={styles.sidebarCard}>
               <div style={styles.sidebarHeader}>
