@@ -9,8 +9,6 @@ const Wall = () => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const draggingMetaRef = useRef(null);
   const elRef = useRef(null);
-  const rafRef = useRef(null);
-  const lastPosRef = useRef({ x: 0, y: 0 });
   const [saved, setSaved] = useState(true);
 
   const openModal = (type) => {
@@ -90,40 +88,32 @@ const Wall = () => {
     const computed = window.getComputedStyle(el);
     const origLeft = parseFloat(computed.left) || 0;
     const origTop = parseFloat(computed.top) || 0;
-    draggingMetaRef.current = { id, origLeft, origTop };
+    draggingMetaRef.current = { id, origLeft, origTop, newLeft: origLeft, newTop: origTop };
     elRef.current = el;
     el.style.zIndex = 2000;
-    el.style.willChange = 'transform';
+    el.style.transition = 'none';
+    el.style.userSelect = 'none';
+    document.body.style.userSelect = 'none';
     setDragging(id);
-  };
-
-  const applyTransform = (deltaX, deltaY) => {
-    const el = elRef.current;
-    if (!el) return;
-    el.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
   };
 
   const handleMouseMove = (e) => {
     if (!dragging || !draggingMetaRef.current) return;
+    const el = elRef.current;
+    if (!el) return;
+    
     const canvas = document.querySelector('.canvas-area');
     if (!canvas) return;
     const canvasRect = canvas.getBoundingClientRect();
-    const newLeft = e.clientX - canvasRect.left - dragOffset.x;
-    const newTop = e.clientY - canvasRect.top - dragOffset.y;
+    const newLeft = Math.max(0, e.clientX - canvasRect.left - dragOffset.x);
+    const newTop = Math.max(0, e.clientY - canvasRect.top - dragOffset.y);
 
-    const { origLeft, origTop } = draggingMetaRef.current;
-    const deltaX = Math.max(0, newLeft) - origLeft;
-    const deltaY = Math.max(0, newTop) - origTop;
-
-    lastPosRef.current = { newLeft: Math.max(0, newLeft), newTop: Math.max(0, newTop), deltaX, deltaY };
-
-    if (!rafRef.current) {
-      rafRef.current = window.requestAnimationFrame(() => {
-        const { deltaX, deltaY } = lastPosRef.current;
-        applyTransform(deltaX, deltaY);
-        rafRef.current = null;
-      });
-    }
+    // Apply position directly for smooth, crisp dragging
+    el.style.left = `${newLeft}px`;
+    el.style.top = `${newTop}px`;
+    
+    // Store for mouseup
+    draggingMetaRef.current = { ...draggingMetaRef.current, newLeft, newTop };
   };
 
   const handleMouseUp = () => {
@@ -131,25 +121,19 @@ const Wall = () => {
     const meta = draggingMetaRef.current;
     const el = elRef.current;
     if (meta && el) {
-      const { newLeft, newTop } = lastPosRef.current;
-      el.style.transform = '';
-      el.style.left = `${newLeft}px`;
-      el.style.top = `${newTop}px`;
+      const { newLeft, newTop } = meta;
+      el.style.transition = '';
       el.style.zIndex = '';
+      el.style.userSelect = '';
+      document.body.style.userSelect = '';
 
       setItems(prev => prev.map(item => item.id === meta.id ? { ...item, left: `${newLeft}px`, top: `${newTop}px` } : item));
-    }
-
-    if (rafRef.current) {
-      window.cancelAnimationFrame(rafRef.current);
-      rafRef.current = null;
+      setSaved(false);
     }
 
     draggingMetaRef.current = null;
     elRef.current = null;
-    lastPosRef.current = { x: 0, y: 0 };
     setDragging(null);
-    setSaved(false);
   };
 
   const styles = {
