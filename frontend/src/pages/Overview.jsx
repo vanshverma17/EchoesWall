@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from 'react-router-dom';
-import { fetchEchoes } from "../services/echoesApi";
+import { fetchEchoes, deleteWallSnapshot } from "../services/echoesApi";
 import { getStoredUser } from "../services/authApi";
 
 const formatTimeAgo = (dateString) => {
@@ -32,6 +32,9 @@ const Overview = () => {
   const [recentEchoes, setRecentEchoes] = React.useState([]);
   const [recentLoading, setRecentLoading] = React.useState(true);
   const [recentError, setRecentError] = React.useState("");
+  const [showAllRecent, setShowAllRecent] = React.useState(false);
+  const [searchTerm, setSearchTerm] = React.useState("");
+  const [deletingId, setDeletingId] = React.useState("");
   const styles = {
     page: {
       minHeight: "100vh",
@@ -294,6 +297,7 @@ const Overview = () => {
       boxShadow: "0 4px 14px rgba(0, 0, 0, 0.06)",
       border: "1px solid rgba(123, 140, 217, 0.15)",
       transition: "all 0.2s ease",
+      justifyContent: "space-between",
     },
     recentThumb: {
       width: "64px",
@@ -314,6 +318,13 @@ const Overview = () => {
       flexDirection: "column",
       gap: "4px",
     },
+    recentMeta: {
+      display: "flex",
+      alignItems: "center",
+      gap: "12px",
+      flex: 1,
+      minWidth: 0,
+    },
     recentTitle: {
       fontWeight: 700,
       color: "#2d3748",
@@ -331,6 +342,35 @@ const Overview = () => {
       color: "#4a5568",
       fontWeight: 600,
       textAlign: "center",
+    },
+    recentActions: {
+      display: "flex",
+      alignItems: "center",
+      gap: "8px",
+      marginLeft: "12px",
+      flexShrink: 0,
+    },
+    actionBtn: {
+      border: "1px solid rgba(123, 140, 217, 0.2)",
+      background: "#ffffff",
+      color: "#4a5568",
+      padding: "6px 12px",
+      borderRadius: "10px",
+      fontWeight: 700,
+      fontSize: "12px",
+      cursor: "pointer",
+      transition: "all 0.2s ease",
+      minWidth: "70px",
+    },
+    editAction: {
+      background: "rgba(123, 140, 217, 0.12)",
+      color: "#5a67d8",
+      border: "1px solid rgba(123, 140, 217, 0.25)",
+    },
+    deleteAction: {
+      background: "rgba(239, 68, 68, 0.08)",
+      color: "#c53030",
+      border: "1px solid rgba(239, 68, 68, 0.25)",
     },
     viewAll: {
       textAlign: "center",
@@ -432,9 +472,55 @@ const Overview = () => {
     loadEchoes();
   }, []);
 
+  React.useEffect(() => {
+    setShowAllRecent(false);
+  }, [searchTerm]);
+
+  const handleDeleteSnapshot = React.useCallback(
+    async (snapshotId) => {
+      if (!snapshotId) return;
+      const confirmed = window.confirm("Delete this wall? This cannot be undone.");
+      if (!confirmed) return;
+      setDeletingId(snapshotId);
+      try {
+        await deleteWallSnapshot(snapshotId);
+        setRecentEchoes((prev) => prev.filter((snap) => (snap.id || snap._id) !== snapshotId));
+      } catch (err) {
+        window.alert("Couldn't delete this wall. Please try again.");
+      } finally {
+        setDeletingId("");
+      }
+    },
+    []
+  );
+
+  const filteredRecentEchoes = React.useMemo(() => {
+    const list = Array.isArray(recentEchoes) ? [...recentEchoes] : [];
+    const query = searchTerm.trim().toLowerCase();
+    if (!query) return list;
+
+    return list.filter((snapshot) => {
+      const textBlob = Array.isArray(snapshot.items)
+        ? snapshot.items.map((it) => it.text || "").join(" ")
+        : "";
+      return textBlob.toLowerCase().includes(query);
+    });
+  }, [recentEchoes, searchTerm]);
+
   const visibleRecentEchoes = React.useMemo(() => {
-    return Array.isArray(recentEchoes) ? [...recentEchoes] : [];
-  }, [recentEchoes]);
+    return showAllRecent ? filteredRecentEchoes : filteredRecentEchoes.slice(0, 5);
+  }, [filteredRecentEchoes, showAllRecent]);
+
+  const recentListStyle = React.useMemo(() => {
+    if (!showAllRecent) return styles.recentItemsContainer;
+    return {
+      ...styles.recentItemsContainer,
+      maxHeight: "440px",
+      minHeight: "260px",
+      overflowY: "auto",
+      paddingRight: "4px",
+    };
+  }, [showAllRecent, styles.recentItemsContainer]);
 
   return (
     <>
@@ -649,6 +735,8 @@ const Overview = () => {
                 className="search-bar"
                 style={styles.searchBar}
                 placeholder="Search memories..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
               />
             </div>
 
@@ -665,34 +753,77 @@ const Overview = () => {
                 </button>
               </div>
 
-              <div style={styles.recentItemsContainer}>
+              <div style={recentListStyle}>
                 {recentLoading ? (
                   <div style={styles.recentEmpty}>Loading recent echoes...</div>
                 ) : recentError ? (
                   <div style={styles.recentEmpty}>{recentError}</div>
                 ) : visibleRecentEchoes.length === 0 ? (
-                  <div style={styles.recentEmpty}>No echoes yet. Create your first memory!</div>
+                  <div style={styles.recentEmpty}>
+                    {searchTerm.trim()
+                      ? "No matches found for your search."
+                      : "No echoes yet. Create your first memory!"}
+                  </div>
                 ) : (
                   visibleRecentEchoes.map((snapshot) => {
+                    const snapshotId = snapshot.id || snapshot._id;
                     const firstText = snapshot.items?.find((it) => it.text)?.text || "Saved wall";
                     const titleText = `${firstText.slice(0, 60)}${firstText.length > 60 ? "…" : ""}`;
                     const timeLabel = formatTimeAgo(snapshot.updatedAt || snapshot.createdAt);
                     const thumbInitial = titleText.trim().charAt(0).toUpperCase() || "W";
                     const countLabel = `${snapshot.items?.length || 0} items`;
                     return (
-                      <div key={snapshot.id || snapshot.updatedAt || snapshot.createdAt || titleText} className="recent-item" style={styles.recentItem}>
-                        <div style={{...styles.recentThumb, display: "flex", alignItems: "center", justifyContent: "center"}}>
-                          {thumbInitial}
+                      <div key={snapshotId || snapshot.updatedAt || snapshot.createdAt || titleText} className="recent-item" style={styles.recentItem}>
+                        <div style={styles.recentMeta}>
+                          <div style={{...styles.recentThumb, display: "flex", alignItems: "center", justifyContent: "center"}}>
+                            {thumbInitial}
+                          </div>
+                          <div style={styles.recentText}>
+                            <div style={styles.recentTitle}>{titleText || "Saved wall"}</div>
+                            <div style={styles.recentTime}>{timeLabel} • {countLabel}</div>
+                          </div>
                         </div>
-                        <div style={styles.recentText}>
-                          <div style={styles.recentTitle}>{titleText || "Saved wall"}</div>
-                          <div style={styles.recentTime}>{timeLabel} • {countLabel}</div>
+                        <div style={styles.recentActions}>
+                          <button
+                            style={{...styles.actionBtn, ...styles.editAction}}
+                            onClick={() => navigate(`/wall/${snapshotId}`)}
+                            disabled={!snapshotId}
+                          >
+                            Edit
+                          </button>
+                          <button
+                            style={{
+                              ...styles.actionBtn,
+                              ...styles.deleteAction,
+                              ...(deletingId === snapshotId ? { opacity: 0.6, cursor: "not-allowed" } : {}),
+                            }}
+                            onClick={() => handleDeleteSnapshot(snapshotId)}
+                            disabled={deletingId === snapshotId}
+                          >
+                            {deletingId === snapshotId ? "Deleting..." : "Delete"}
+                          </button>
                         </div>
                       </div>
                     );
                   })
                 )}
               </div>
+
+              {filteredRecentEchoes.length > 5 && !recentLoading && !recentError && (
+                <div style={styles.viewAll}>
+                  <a
+                    href="#"
+                    className="view-all-link"
+                    style={styles.viewAllLink}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setShowAllRecent((prev) => !prev);
+                    }}
+                  >
+                    {showAllRecent ? "Show Less" : "View All"}
+                  </a>
+                </div>
+              )}
             </div>
           </div>
         </div>

@@ -20,7 +20,8 @@ function AppContent() {
         <Route path='/signup' element={<Signup/>} />
         <Route path='/overview' element={<Overview/>} />
         <Route path='/wall' element={<Wall/>} />
-        <Route path='/wall/new' element={<Wall isNew />} />
+          <Route path='/wall/:id' element={<Wall />} />
+          <Route path='/wall/new' element={<Wall isNew />} />
       </Routes>
     </>
   );

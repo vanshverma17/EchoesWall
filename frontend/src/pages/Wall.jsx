@@ -1,10 +1,13 @@
 import React, { useState, useRef } from "react";
-import { useLocation } from "react-router-dom";
-import { fetchEchoes, saveEchoes, deleteAllEchoes } from "../services/echoesApi";
+
+const PIN_COLORS = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
+import { useLocation, useParams } from "react-router-dom";
+import { fetchEchoes, saveEchoes, deleteAllEchoes, fetchWallSnapshot } from "../services/echoesApi";
 import { getStoredUser } from "../services/authApi";
 
 const Wall = ({ isNew = false }) => {
   const location = useLocation();
+  const { id: wallId } = useParams();
   const isNewWall = isNew || location.pathname.startsWith("/wall/new");
   const [items, setItems] = useState([]);
   const [showModal, setShowModal] = useState(false);
@@ -101,8 +104,9 @@ const Wall = ({ isNew = false }) => {
     }
   };
 
-  const pinColors = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
-  const getRandomPinColor = () => pinColors[Math.floor(Math.random() * pinColors.length)];
+  const getRandomPinColor = React.useCallback(() => {
+    return PIN_COLORS[Math.floor(Math.random() * PIN_COLORS.length)] || PIN_COLORS[0];
+  }, []);
 
   const saveWall = async () => {
     setSaving(true);
@@ -121,13 +125,19 @@ const Wall = ({ isNew = false }) => {
     }
   };
 
-  const loadWall = async () => {
+  const loadWall = React.useCallback(async () => {
     setLoading(true);
     setError("");
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
-      const existing = await fetchEchoes({ signal: controller.signal });
+      let existing;
+      if (wallId && !isNewWall) {
+        const snapshot = await fetchWallSnapshot(wallId, { signal: controller.signal });
+        existing = snapshot.items || [];
+      } else {
+        existing = await fetchEchoes({ signal: controller.signal });
+      }
       setItems(Array.isArray(existing) ? existing.filter((it) => it && it.type) : []);
       setSaved(true);
     } catch (err) {
@@ -139,7 +149,7 @@ const Wall = ({ isNew = false }) => {
       clearTimeout(timeoutId);
       setLoading(false);
     }
-  };
+  }, [isNewWall, wallId]);
 
   React.useEffect(() => {
     const user = getStoredUser();
@@ -156,7 +166,7 @@ const Wall = ({ isNew = false }) => {
     }
 
     loadWall();
-  }, [isNewWall]);
+  }, [isNewWall, loadWall]);
 
   const zoomIn = () => {
     setZoom(prev => Math.min(prev + 0.1, 2));

@@ -169,6 +169,19 @@ app.get("/api/walls/latest", async (_req, res, next) => {
   }
 });
 
+app.get("/api/walls/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const wall = await WallSnapshot.findById(id);
+    if (!wall) {
+      return res.status(404).json({ message: "Wall not found" });
+    }
+    res.json(wall);
+  } catch (err) {
+    next(err);
+  }
+});
+
 app.post("/api/walls", async (req, res, next) => {
   try {
     const { items } = req.body || {};
@@ -188,6 +201,19 @@ app.post("/api/walls", async (req, res, next) => {
 app.delete("/api/walls", async (_req, res, next) => {
   try {
     await WallSnapshot.deleteMany({});
+    res.status(204).send();
+  } catch (err) {
+    next(err);
+  }
+});
+
+app.delete("/api/walls/:id", async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const removed = await WallSnapshot.findByIdAndDelete(id);
+    if (!removed) {
+      return res.status(404).json({ message: "Wall not found" });
+    }
     res.status(204).send();
   } catch (err) {
     next(err);

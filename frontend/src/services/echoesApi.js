@@ -62,6 +62,20 @@ export const fetchEchoes = async (options = {}) => {
   }
 };
 
+export const fetchWallSnapshot = async (id, options = {}) => {
+  const { signal } = options;
+  const data = await handleResponse(await fetch(`${API_BASE_URL}/api/walls/${id}`, { signal }));
+  return normalizeSnapshot(data || {});
+};
+
+export const deleteWallSnapshot = async (id) => {
+  await handleResponse(
+    await fetch(`${API_BASE_URL}/api/walls/${id}`, {
+      method: "DELETE",
+    })
+  );
+};
+
 export const saveEchoes = async (items = []) => {
   const payload = {
     items: items.map(({ type, text, src, color, top, left }) => ({
