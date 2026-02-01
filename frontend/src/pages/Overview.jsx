@@ -1,16 +1,20 @@
 import React from "react";
+import { useNavigate } from 'react-router-dom';
 
 const Overview = () => {
+  const navigate = useNavigate();
   const styles = {
     page: {
       minHeight: "100vh",
-      width: "100vw",
+      width: "100%",
+      maxWidth: "100vw",
       background: "linear-gradient(to bottom right, #e8eef9 0%, #f5f7fb 50%, #ffffff 100%)",
       fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
       color: "#2d3748",
       padding: "12px 16px",
       boxSizing: "border-box",
       overflow: "hidden",
+      overflowY: "auto",
     },
     topBar: {
       display: "flex",
@@ -111,8 +115,8 @@ const Overview = () => {
       height: "100%",
       position: "relative",
       overflow: "hidden",
-      boxShadow: "inset 0 2px 8px rgba(123, 140, 217, 0.05)",
-      border: "none",
+      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1), 0 8px 32px rgba(123, 140, 217, 0.15), inset 0 2px 8px rgba(123, 140, 217, 0.05)",
+      border: "1px solid rgba(255, 255, 255, 0.8)",
     },
     polaroid: {
       position: "absolute",
@@ -496,7 +500,7 @@ const Overview = () => {
           {/* Sidebar */}
           <div style={styles.sidebar}>
             {/* Tall New Memory button matching board height */}
-            <button style={styles.newMemoryTall} aria-label="Create New Memory">
+            <button style={styles.newMemoryTall} onClick={() => navigate('/wall')} aria-label="Create New Memory">
               + New Memory
             </button>
 
