@@ -18,12 +18,15 @@ const Wall = ({ isNew = false }) => {
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
   const draggingMetaRef = useRef(null);
   const elRef = useRef(null);
+  const canvasRef = useRef(null);
   const [saved, setSaved] = useState(true);
   const [zoom, setZoom] = useState(1);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [owner, setOwner] = useState("");
+  const [exporting, setExporting] = useState(false);
+  const html2CanvasLoader = useRef(null);
 
   const openModal = (type) => {
     setModalType(type);
@@ -196,6 +199,53 @@ const Wall = ({ isNew = false }) => {
 
   const resetZoom = () => {
     setZoom(1);
+  };
+
+  const loadHtml2Canvas = async () => {
+    if (window.html2canvas) return window.html2canvas;
+    if (html2CanvasLoader.current) return html2CanvasLoader.current;
+
+    html2CanvasLoader.current = new Promise((resolve, reject) => {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+      script.onload = () => resolve(window.html2canvas);
+      script.onerror = reject;
+      document.body.appendChild(script);
+    });
+
+    return html2CanvasLoader.current;
+  };
+
+  const downloadBoardImage = async () => {
+    if (!canvasRef.current) return;
+    try {
+      setExporting(true);
+      const html2canvas = await loadHtml2Canvas();
+      const canvas = await html2canvas(canvasRef.current, {
+        backgroundColor: null,
+        scale: 2,
+        useCORS: true,
+        logging: false,
+      });
+
+      canvas.toBlob((blob) => {
+        if (!blob) {
+          setExporting(false);
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = `echoes-wall-${new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-")}.png`;
+        link.click();
+        URL.revokeObjectURL(url);
+        setExporting(false);
+      }, "image/png");
+    } catch (err) {
+      console.error("Board download failed", err);
+      setError("Could not save the board right now. Please try again.");
+      setExporting(false);
+    }
   };
 
   const handleMouseDown = (e, id) => {
@@ -423,31 +473,45 @@ const Wall = ({ isNew = false }) => {
       fontWeight: 600,
     },
     canvasWrap: {
-      flex: 1,
-      minHeight: 0,
       position: "relative",
-      borderRadius: "20px",
-      overflow: "auto",
-      boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1)",
-      width: "calc(100% - 100px)",
-      height: "85%",
-      margin: "0",
+      flex: 1,
+      background: "linear-gradient(180deg, #f8fbff 0%, #eef3fb 100%)",
+      borderRadius: "16px",
+      overflow: "hidden",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
+      border: "1px solid rgba(123, 140, 217, 0.12)",
     },
     canvas: {
-      height: "100%",
-      minWidth: "100%",
       position: "relative",
-      backgroundImage:
-        "linear-gradient(#dff0ff 1px, transparent 1px), linear-gradient(90deg, #dff0ff 1px, transparent 1px)",
-      backgroundSize: "30px 30px",
-      backgroundColor: "#fafcff",
-      borderRadius: "20px",
+      width: "100%",
+      height: "100%",
+      background: "transparent",
+      overflow: "hidden",
     },
-    loadingState: {
-      padding: "24px",
-      textAlign: "center",
-      color: "#4a5568",
-      fontWeight: 600,
+    boardCamera: {
+      position: "absolute",
+      right: "18px",
+      bottom: "18px",
+      background: "linear-gradient(135deg, #ffffff 0%, #f4f6ff 100%)",
+      backdropFilter: "blur(12px)",
+      padding: "11px 16px",
+      borderRadius: "14px",
+      boxShadow: "0 10px 30px rgba(90, 103, 216, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06)",
+      display: "flex",
+      alignItems: "center",
+      gap: "9px",
+      fontSize: "13px",
+      fontWeight: 700,
+      color: "#4752c4",
+      border: "1px solid rgba(90, 103, 216, 0.15)",
+      cursor: "pointer",
+      zIndex: 150,
+      transition: "all 0.2s ease",
+    },
+    boardCameraText: {
+      fontSize: "13px",
+      fontWeight: 700,
+      color: "#4752c4",
     },
     zoomControls: {
       position: "absolute",
@@ -807,6 +871,18 @@ const Wall = ({ isNew = false }) => {
           z-index: 50;
         }
 
+        .board-camera:hover:not([disabled]) {
+          transform: translateY(-2px);
+          box-shadow: 0 8px 24px rgba(123, 140, 217, 0.3) !important;
+        }
+
+        .board-camera[disabled] {
+          opacity: 0.6;
+          cursor: not-allowed;
+          box-shadow: none !important;
+          transform: none !important;
+        }
+
         .item-delete-btn {
           opacity: 0;
           pointer-events: none;
@@ -903,7 +979,14 @@ const Wall = ({ isNew = false }) => {
         </div>
 
         <div style={styles.canvasWrap}>
-          <div className="canvas-area" style={styles.canvas} onMouseMove={handleMouseMove} onMouseUp={handleMouseUp} onMouseLeave={handleMouseUp}>
+          <div
+            ref={canvasRef}
+            className="canvas-area"
+            style={styles.canvas}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseUp}
+          >
             <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
               {loading ? (
                 <div style={styles.loadingState}>Loading your wall...</div>
@@ -969,6 +1052,21 @@ const Wall = ({ isNew = false }) => {
                 +
               </button>
             </div>
+
+            <button
+              className="board-camera"
+              style={styles.boardCamera}
+              onClick={downloadBoardImage}
+              disabled={exporting}
+              data-html2canvas-ignore="true"
+              title="Save board to your device"
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                <circle cx="12" cy="13" r="4"></circle>
+              </svg>
+              <span style={styles.boardCameraText}>{exporting ? "Saving..." : "Board Camera"}</span>
+            </button>
           </div>
         </div>
 
