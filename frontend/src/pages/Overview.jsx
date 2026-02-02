@@ -134,7 +134,7 @@ const Overview = () => {
     },
     mainContent: {
       display: "grid",
-      gridTemplateColumns: "1fr 400px",
+      gridTemplateColumns: "65% 35%",
       gap: "20px",
       alignItems: "stretch",
       height: "calc(100vh - 140px)",
@@ -147,7 +147,7 @@ const Overview = () => {
       boxShadow: "0 6px 24px rgba(123, 140, 217, 0.1), 0 2px 6px rgba(0, 0, 0, 0.04)",
       position: "relative",
       border: "none",
-      width: "80%",
+      width: "100%",
     },
     board: {
       background: "linear-gradient(to bottom, #fafbff 0%, #f0f3f9 100%)",
@@ -239,6 +239,7 @@ const Overview = () => {
       display: "flex",
       flexDirection: "column",
       gap: "20px",
+      width: "100%",
     },
     newMemoryTall: {
       background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
@@ -260,8 +261,8 @@ const Overview = () => {
       transition: "all 0.3s ease",
     },
     sidebarCard: {
-      width: "calc(100% + 200px)",
-      marginLeft: "-200px",
+      width: "100%",
+      marginLeft: 0,
       background: "rgba(255, 255, 255, 0.8)",
       backdropFilter: "blur(20px)",
       borderRadius: "16px",
@@ -433,8 +434,8 @@ const Overview = () => {
       display: "flex",
       gap: "10px",
       alignItems: "center",
-      width: "calc(100% + 200px)",
-      marginLeft: "-200px",
+      width: "100%",
+      marginLeft: 0,
     },
     modalOverlay: {
       position: "fixed",
