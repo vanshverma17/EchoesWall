@@ -25,6 +25,7 @@ const Wall = ({ isNew = false }) => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
   const [wallTitle, setWallTitle] = useState("");
+  const [lastSavedTitle, setLastSavedTitle] = useState("");
   const [exporting, setExporting] = useState(false);
   const html2CanvasLoader = useRef(null);
 
@@ -129,6 +130,7 @@ const Wall = ({ isNew = false }) => {
         title: titleToSave,
       });
       setItems(persisted);
+      setLastSavedTitle(titleToSave);
       setSaved(true);
     } catch (err) {
       console.error(err);
@@ -167,7 +169,9 @@ const Wall = ({ isNew = false }) => {
         : [];
       setItems(normalized);
       if (snapshotMeta?.title !== undefined) {
-        setWallTitle(snapshotMeta.title || "");
+        const loadedTitle = snapshotMeta.title || "";
+        setWallTitle(loadedTitle);
+        setLastSavedTitle((loadedTitle || "").trim());
       }
       setSaved(true);
     } catch (err) {
@@ -191,6 +195,13 @@ const Wall = ({ isNew = false }) => {
 
     loadWall();
   }, [isNewWall, wallId, loadWall]);
+
+  React.useEffect(() => {
+    const trimmed = (wallTitle || "").trim();
+    if (trimmed !== (lastSavedTitle || "")) {
+      setSaved(false);
+    }
+  }, [wallTitle, lastSavedTitle]);
 
   const zoomIn = () => {
     setZoom(prev => Math.min(prev + 0.1, 2));
