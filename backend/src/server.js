@@ -119,6 +119,11 @@ app.get("/api/health", (_req, res) => {
   res.json({ status: "ok" });
 });
 
+// root route for browsers / render health checks
+app.get("/", (_req, res) => {
+  res.json({ status: "ok", message: "EchoesWall API is running" });
+});
+
 app.get("/api/auth/ping", (_req, res) => {
   res.json({ status: "ok" });
 });
