@@ -24,7 +24,7 @@ const Wall = ({ isNew = false }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
-  const [owner, setOwner] = useState("");
+  const [wallTitle, setWallTitle] = useState("");
   const [exporting, setExporting] = useState(false);
   const html2CanvasLoader = useRef(null);
 
@@ -113,6 +113,7 @@ const Wall = ({ isNew = false }) => {
 
   const saveWall = async () => {
     const user = getStoredUser();
+    const titleToSave = (wallTitle || "").trim();
     setSaving(true);
     setError("");
     try {
@@ -125,6 +126,7 @@ const Wall = ({ isNew = false }) => {
       const persisted = await saveEchoes(cleanedItems, {
         wallId: wallId && !isNewWall ? wallId : undefined,
         user,
+        title: titleToSave,
       });
       setItems(persisted);
       setSaved(true);
@@ -145,11 +147,15 @@ const Wall = ({ isNew = false }) => {
     const timeoutId = setTimeout(() => controller.abort(), 8000);
     try {
       let existing;
+      let snapshotMeta;
       if (wallId && !isNewWall) {
         const snapshot = await fetchWallSnapshot(wallId, { signal: controller.signal, userId: user?.id });
         existing = snapshot.items || [];
+        snapshotMeta = snapshot;
       } else {
-        existing = await fetchEchoes({ signal: controller.signal, userId: user?.id });
+        const latest = await fetchEchoes({ signal: controller.signal, userId: user?.id });
+        existing = latest?.items || latest || [];
+        snapshotMeta = latest;
       }
       const normalized = Array.isArray(existing)
         ? existing
@@ -160,6 +166,9 @@ const Wall = ({ isNew = false }) => {
             }))
         : [];
       setItems(normalized);
+      if (snapshotMeta?.title !== undefined) {
+        setWallTitle(snapshotMeta.title || "");
+      }
       setSaved(true);
     } catch (err) {
       console.error(err);
@@ -173,12 +182,6 @@ const Wall = ({ isNew = false }) => {
   }, [isNewWall, wallId]);
 
   React.useEffect(() => {
-    const user = getStoredUser();
-    if (user) {
-      const name = user.name || user.email || "Friend";
-      setOwner(name.split(" ")[0] || name);
-    }
-
     if (isNewWall) {
       setItems([]);
       setSaved(false);
@@ -463,6 +466,18 @@ const Wall = ({ isNew = false }) => {
       alignItems: "center",
       gap: "12px",
       flexWrap: "wrap",
+    },
+    wallNameInput: {
+      minWidth: "220px",
+      padding: "10px 12px",
+      borderRadius: "10px",
+      border: "1px solid rgba(123, 140, 217, 0.35)",
+      background: "rgba(255, 255, 255, 0.9)",
+      fontSize: "14px",
+      fontWeight: 600,
+      color: "#2d3748",
+      outline: "none",
+      boxShadow: "0 4px 12px rgba(123, 140, 217, 0.12)",
     },
     errorBanner: {
       padding: "8px 12px",
@@ -951,7 +966,13 @@ const Wall = ({ isNew = false }) => {
 
         <div style={styles.header}>
           <div style={styles.statusRow}>
-            <h2 style={styles.title}>Create Your Wall{owner ? `, ${owner}` : ""}</h2>
+            <h2 style={styles.title}>Create Your Wall</h2>
+            <input
+              style={styles.wallNameInput}
+              value={wallTitle}
+              onChange={(e) => setWallTitle(e.target.value)}
+              placeholder="Name your wall"
+            />
             {saving ? (
               <div style={styles.unsavedIndicator}>
                 <span>●</span>

@@ -49,6 +49,7 @@ const wallSnapshotSchema = new mongoose.Schema(
     ownerId: { type: String, required: true, index: true },
     ownerEmail: { type: String, required: true, lowercase: true, trim: true },
     ownerName: { type: String, required: true, trim: true },
+    title: { type: String, default: "", trim: true },
   },
   {
     collection: "wallSnapshots",
@@ -218,7 +219,7 @@ app.get("/api/walls/:id", async (req, res, next) => {
 
 app.post("/api/walls", async (req, res, next) => {
   try {
-    const { items, userId, userEmail, userName } = req.body || {};
+    const { items, userId, userEmail, userName, title } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
     }
@@ -233,6 +234,7 @@ app.post("/api/walls", async (req, res, next) => {
       ownerId: userId,
       ownerEmail: userEmail.trim().toLowerCase(),
       ownerName: userName.trim(),
+      title: title?.trim?.() || "",
     });
     res.status(201).json(attachItemIds(wall));
   } catch (err) {
@@ -243,7 +245,7 @@ app.post("/api/walls", async (req, res, next) => {
 app.put("/api/walls/:id", async (req, res, next) => {
   try {
     const { id } = req.params;
-    const { items, userId, userEmail, userName } = req.body || {};
+    const { items, userId, userEmail, userName, title } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
     }
@@ -258,6 +260,7 @@ app.put("/api/walls/:id", async (req, res, next) => {
         items: sanitized,
         ownerEmail: userEmail.trim().toLowerCase(),
         ownerName: userName.trim(),
+        title: title?.trim?.() || "",
       },
       { new: true, runValidators: true }
     );
@@ -318,7 +321,7 @@ app.get("/api/echoes", async (req, res, next) => {
 
 app.put("/api/echoes", async (req, res, next) => {
   try {
-    const { items, userId, userEmail, userName } = req.body || {};
+    const { items, userId, userEmail, userName, title } = req.body || {};
     if (!Array.isArray(items)) {
       return res.status(400).json({ message: "items array is required" });
     }
@@ -332,6 +335,7 @@ app.put("/api/echoes", async (req, res, next) => {
       ownerId: userId,
       ownerEmail: userEmail.trim().toLowerCase(),
       ownerName: userName.trim(),
+      title: title?.trim?.() || "",
     });
     const snapshot = attachItemIds(wall);
     res.json(snapshot.items || []);

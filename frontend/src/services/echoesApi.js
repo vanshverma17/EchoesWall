@@ -25,6 +25,7 @@ const normalizeEcho = (doc = {}) => ({
 
 const normalizeSnapshot = (doc = {}) => ({
   id: doc._id || doc.id,
+  title: doc.title || "",
   items: Array.isArray(doc.items) ? doc.items.map(normalizeEcho) : [],
   createdAt: doc.createdAt,
   updatedAt: doc.updatedAt,
@@ -62,13 +63,13 @@ export const fetchEchoes = async (options = {}) => {
       await fetch(`${API_BASE_URL}/api/walls/latest?userId=${encodeURIComponent(userId)}`, { signal })
     );
     const normalized = normalizeSnapshot(latest || {});
-    return normalized.items;
+    return normalized;
   } catch {
     // Fallback to legacy echoes list
     const latestEchoes = await handleResponse(
       await fetch(`${API_BASE_URL}/api/echoes?userId=${encodeURIComponent(userId)}`, { signal })
     );
-    return Array.isArray(latestEchoes) ? latestEchoes.map(normalizeEcho) : [];
+    return normalizeSnapshot({ items: Array.isArray(latestEchoes) ? latestEchoes.map(normalizeEcho) : [] });
   }
 };
 
@@ -90,7 +91,7 @@ export const deleteWallSnapshot = async (id, options = {}) => {
 };
 
 export const saveEchoes = async (items = [], options = {}) => {
-  const { wallId, user } = options;
+  const { wallId, user, title } = options;
   const payload = {
     items: items.map(({ type, text, src, color, top, left }) => ({
       type,
@@ -103,6 +104,7 @@ export const saveEchoes = async (items = [], options = {}) => {
     userId: user?.id,
     userEmail: user?.email,
     userName: user?.name,
+    title,
   };
 
   const endpoint = wallId ? `${API_BASE_URL}/api/walls/${wallId}` : `${API_BASE_URL}/api/walls`;
@@ -133,7 +135,7 @@ export const saveEchoes = async (items = [], options = {}) => {
       })
     );
 
-    return Array.isArray(data) ? data.map(normalizeEcho) : [];
+    return normalizeSnapshot({ items: Array.isArray(data) ? data.map(normalizeEcho) : [], title });
   }
 };
 

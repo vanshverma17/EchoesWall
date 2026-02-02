@@ -567,7 +567,8 @@ const Overview = () => {
       const textBlob = Array.isArray(snapshot.items)
         ? snapshot.items.map((it) => it.text || "").join(" ")
         : "";
-      return textBlob.toLowerCase().includes(query);
+      const title = snapshot.title || "";
+      return (title.toLowerCase().includes(query) || textBlob.toLowerCase().includes(query));
     });
   }, [recentEchoes, searchTerm]);
 
@@ -831,10 +832,12 @@ const Overview = () => {
                 ) : (
                   visibleRecentEchoes.map((snapshot) => {
                     const snapshotId = snapshot.id || snapshot._id;
-                    const firstText = snapshot.items?.find((it) => it.text)?.text || "Saved wall";
-                    const titleText = `${firstText.slice(0, 60)}${firstText.length > 60 ? "…" : ""}`;
+                    const baseTitle = snapshot.title?.trim?.() || "Saved wall";
+                    const firstText = snapshot.items?.find((it) => it.text)?.text || baseTitle;
+                    const titleText = `${baseTitle || firstText}`.trim() || "Saved wall";
+                    const displayTitle = `${titleText.slice(0, 60)}${titleText.length > 60 ? "…" : ""}`;
                     const timeLabel = formatTimeAgo(snapshot.updatedAt || snapshot.createdAt);
-                    const thumbInitial = titleText.trim().charAt(0).toUpperCase() || "W";
+                    const thumbInitial = displayTitle.trim().charAt(0).toUpperCase() || "W";
                     const countLabel = `${snapshot.items?.length || 0} items`;
                     return (
                       <div key={snapshotId || snapshot.updatedAt || snapshot.createdAt || titleText} className="recent-item" style={styles.recentItem}>
@@ -843,7 +846,7 @@ const Overview = () => {
                             {thumbInitial}
                           </div>
                           <div style={styles.recentText}>
-                            <div style={styles.recentTitle}>{titleText || "Saved wall"}</div>
+                            <div style={styles.recentTitle}>{displayTitle || "Saved wall"}</div>
                             <div style={styles.recentTime}>{timeLabel} • {countLabel}</div>
                           </div>
                         </div>
@@ -861,7 +864,7 @@ const Overview = () => {
                               ...styles.deleteAction,
                               ...(deletingId === snapshotId ? { opacity: 0.6, cursor: "not-allowed" } : {}),
                             }}
-                            onClick={() => requestDelete(snapshotId, titleText)}
+                            onClick={() => requestDelete(snapshotId, displayTitle)}
                             disabled={deletingId === snapshotId}
                           >
                             {deletingId === snapshotId ? "Deleting..." : "Delete"}
