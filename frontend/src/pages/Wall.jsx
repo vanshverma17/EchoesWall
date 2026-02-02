@@ -124,13 +124,17 @@ const Wall = ({ isNew = false }) => {
           ...it,
           id: it.id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
         }));
-      const persisted = await saveEchoes(cleanedItems, {
+      const persistedSnapshot = await saveEchoes(cleanedItems, {
         wallId: wallId && !isNewWall ? wallId : undefined,
         user,
         title: titleToSave,
       });
-      setItems(persisted);
-      setLastSavedTitle(titleToSave);
+      setItems(persistedSnapshot?.items || []);
+
+      const serverTitle = persistedSnapshot?.title;
+      const finalTitle = serverTitle && serverTitle.trim() ? serverTitle : titleToSave;
+      setWallTitle(finalTitle || "");
+      setLastSavedTitle((finalTitle || "").trim());
       setSaved(true);
     } catch (err) {
       console.error(err);

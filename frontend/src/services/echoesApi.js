@@ -122,7 +122,7 @@ export const saveEchoes = async (items = [], options = {}) => {
     );
 
     const snapshot = normalizeSnapshot(data || {});
-    return snapshot.items;
+    return snapshot;
   } catch {
     // Fallback to legacy endpoint
     const data = await handleResponse(
