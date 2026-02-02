@@ -546,7 +546,7 @@ const Wall = ({ isNew = false }) => {
     },
     stickyNote: {
       position: "absolute",
-      padding: "14px 16px",
+      padding: "14px 16px 40px 16px",
       borderRadius: "2px",
       boxShadow: "0 6px 18px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06)",
       fontSize: "13px",
@@ -592,6 +592,20 @@ const Wall = ({ isNew = false }) => {
       color: "white",
       cursor: "pointer",
       fontWeight: 600,
+    },
+    noteDeleteBtn: {
+      padding: "4px 10px",
+      fontSize: "11px",
+      borderRadius: "6px",
+      border: "none",
+      background: "rgba(239, 107, 107, 0.9)",
+      color: "white",
+      cursor: "pointer",
+      fontWeight: 600,
+      position: "absolute",
+      left: "50%",
+      transform: "translateX(-50%)",
+      bottom: "8px",
     },
     overlay: {
       position: "fixed",
@@ -792,6 +806,19 @@ const Wall = ({ isNew = false }) => {
           transform: scale(1.05) !important;
           z-index: 50;
         }
+
+        .item-delete-btn {
+          opacity: 0;
+          pointer-events: none;
+          transition: opacity 0.2s ease;
+        }
+
+        .sticky-note:hover .item-delete-btn,
+        .cloud:hover .item-delete-btn,
+        .polaroid:hover .item-delete-btn {
+          opacity: 1;
+          pointer-events: auto;
+        }
         
         input:focus, textarea:focus {
           border-color: rgba(123, 140, 217, 0.5) !important;
@@ -889,7 +916,7 @@ const Wall = ({ isNew = false }) => {
                         <div style={styles.pinNeedle}></div>
                       </div>
                       <div style={styles.stickyText}>{it.text}</div>
-                      <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
+                      <button className="item-delete-btn" style={styles.noteDeleteBtn} onClick={() => removeItem(it.id)}>
                         Delete
                       </button>
                     </div>
@@ -903,7 +930,7 @@ const Wall = ({ isNew = false }) => {
                         <div style={styles.pinNeedle}></div>
                       </div>
                       <div style={styles.cloudText}>{it.text}</div>
-                      <button style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
+                      <button className="item-delete-btn" style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
                         Delete
                       </button>
                     </div>
@@ -917,7 +944,7 @@ const Wall = ({ isNew = false }) => {
                         <div style={styles.pinNeedle}></div>
                       </div>
                       <img src={it.src} alt="memory" style={styles.polaroidImg} />
-                      <button style={styles.deleteBtn} onClick={() => removeItem(it.id)}>
+                      <button className="item-delete-btn" style={styles.deleteBtn} onClick={() => removeItem(it.id)}>
                         Delete
                       </button>
                     </div>
