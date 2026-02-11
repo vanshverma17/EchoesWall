@@ -677,15 +677,119 @@ const Overview = () => {
         ::-webkit-scrollbar-thumb:hover {
           background: rgba(123, 140, 217, 0.5);
         }
+        
+        @media (max-width: 768px) {
+          .overview-page {
+            padding: 8px 12px !important;
+            overflow-x: hidden !important;
+          }
+          
+          .overview-top-bar {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 12px !important;
+            margin-bottom: 12px !important;
+          }
+          
+          .welcome-text {
+            font-size: 32px !important;
+          }
+          
+          .welcome-subtitle {
+            font-size: 14px !important;
+          }
+          
+          .new-memory-btn {
+            padding: 8px 18px !important;
+            font-size: 13px !important;
+          }
+          
+          .main-content-grid {
+            grid-template-columns: 1fr !important;
+            gap: 16px !important;
+            height: auto !important;
+          }
+          
+          .board-container {
+            padding: 16px !important;
+            height: 400px !important;
+          }
+          
+          .board-inner {
+            height: 100% !important;
+          }
+          
+          .polaroid {
+            width: 100px !important;
+            padding: 6px 6px 24px 6px !important;
+          }
+          
+          .polaroid img {
+            width: 88px !important;
+            height: 80px !important;
+          }
+          
+          .sticky-note {
+            padding: 8px 10px !important;
+            font-size: 10px !important;
+            max-width: 90px !important;
+          }
+          
+          .sidebar-section {
+            width: 100% !important;
+          }
+          
+          .sidebar-card {
+            padding: 14px !important;
+          }
+          
+          .recent-item {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 10px !important;
+          }
+          
+          .recent-meta {
+            width: 100% !important;
+          }
+          
+          .recent-actions {
+            width: 100% !important;
+            margin-left: 0 !important;
+            justify-content: flex-end !important;
+          }
+          
+          .search-container {
+            flex-direction: row !important;
+          }
+          
+          .camera-icon {
+            bottom: 12px !important;
+            left: 12px !important;
+            padding: 6px 10px !important;
+            font-size: 10px !important;
+          }
+          
+          .camera-icon svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          
+          .edit-btn {
+            bottom: 12px !important;
+            padding: 6px 16px !important;
+            font-size: 11px !important;
+          }
+        }
       `}</style>
-      <div style={styles.page}>
+      <div className="overview-page" style={styles.page}>
         {/* Top Bar */}
-        <div style={styles.topBar}>
+        <div className="overview-top-bar" style={styles.topBar}>
           {/* Welcome Section */}
           <div style={styles.welcomeSection}>
             <div>
-              <h2 style={styles.welcomeText}>Welcome back, {firstName}!</h2>
-              <div style={styles.welcomeSubtitle}>
+              <h2 className="welcome-text" style={styles.welcomeText}>Welcome back, {firstName}!</h2>
+              <div className="welcome-subtitle" style={styles.welcomeSubtitle}>
                 {echoLoading
                   ? "Loading your echoes..."
                   : echoError
@@ -697,10 +801,10 @@ const Overview = () => {
         </div>
 
         {/* Main Content */}
-        <div style={styles.mainContent}>
+        <div className="main-content-grid" style={styles.mainContent}>
           {/* Board */}
-          <div style={styles.boardContainer}>
-            <div style={styles.board}>
+          <div className="board-container" style={styles.boardContainer}>
+            <div className="board-inner" style={styles.board}>
               {/* Polaroid Photos */}
               <div className="polaroid" style={{...styles.polaroid, top: "35px", left: "45px", transform: "rotate(-7deg)"}}>
                 <img src="https://images.unsplash.com/photo-1502933691298-84fc14542831?w=400&q=80" alt="Palm trees" style={styles.polaroidImg} />
@@ -789,9 +893,9 @@ const Overview = () => {
           </div>
 
           {/* Sidebar */}
-          <div style={styles.sidebar}>
+          <div className="sidebar-section" style={styles.sidebar}>
             {/* Search Bar with New Memory Button */}
-            <div style={styles.searchContainer}>
+            <div className="search-container" style={styles.searchContainer}>
               <button style={styles.newMemoryTall} onClick={() => navigate('/wall/new')} aria-label="Create New Memory">
                 +
               </button>
@@ -806,7 +910,7 @@ const Overview = () => {
             </div>
 
             {/* Recent Section */}
-            <div style={styles.sidebarCard}>
+            <div className="sidebar-card" style={styles.sidebarCard}>
               <div style={styles.sidebarHeader}>
                 <div style={styles.sidebarTitle}>Recent</div>
                 <button className="icon-btn" style={{...styles.iconButton, fontSize: "16px", width: "32px", height: "32px"}}>

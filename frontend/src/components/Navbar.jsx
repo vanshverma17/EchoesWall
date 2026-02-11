@@ -171,12 +171,44 @@ const Navbar = () => {
         .dropdown-menu {
           animation: slideDown 0.2s ease-out;
         }
+        
+        @media (max-width: 768px) {
+          .navbar-container {
+            padding: 6px 16px !important;
+          }
+          
+          .navbar-logo {
+            font-size: 22px !important;
+          }
+          
+          .nav-links-container {
+            gap: 12px !important;
+          }
+          
+          .nav-link {
+            font-size: 12px !important;
+          }
+          
+          .profile-avatar {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 14px !important;
+          }
+          
+          .user-name-text {
+            display: none !important;
+          }
+          
+          .dropdown-arrow {
+            display: none !important;
+          }
+        }
       `}</style>
-      <nav style={styles.navbar}>
+      <nav className="navbar-container" style={styles.navbar}>
         <Link to="/overview" className="navbar-logo" style={styles.logo}>
           Echoes
         </Link>
-        <div style={styles.navLinks}>
+        <div className="nav-links-container" style={styles.navLinks}>
           <Link to="/overview" className="nav-link" style={styles.navLink}>
             Overview
           </Link>
@@ -189,8 +221,8 @@ const Navbar = () => {
             </div>
             {user && (
               <>
-                <span style={styles.userName}>{user.name || user.email}</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a5568" strokeWidth="2" style={{ transition: "transform 0.2s ease", transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)" }}>
+                <span className="user-name-text" style={styles.userName}>{user.name || user.email}</span>
+                <svg className="dropdown-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a5568" strokeWidth="2" style={{ transition: "transform 0.2s ease", transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)" }}>
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
                 

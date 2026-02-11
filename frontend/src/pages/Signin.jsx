@@ -273,10 +273,45 @@ const Signin = () => {
         a:hover {
           color: #6a7bc5 !important;
         }
+        
+        @media (max-width: 768px) {
+          .signin-page {
+            padding: 20px !important;
+            overflow-x: hidden !important;
+          }
+          
+          .polaroid-signin {
+            width: 120px !important;
+            padding: 8px 8px 28px 8px !important;
+          }
+          
+          .polaroid-signin img {
+            height: 100px !important;
+          }
+          
+          .signin-card {
+            padding: 36px 28px !important;
+            max-width: 95vw !important;
+          }
+          
+          .signin-heading {
+            font-size: 28px !important;
+          }
+          
+          .signin-input {
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+          }
+          
+          .signin-button {
+            padding: 12px !important;
+            font-size: 15px !important;
+          }
+        }
       `}</style>
-      <div style={styles.page}>
+      <div className="signin-page" style={styles.page}>
         {polaroidPhotos.map((photo, index) => (
-          <div key={index} style={styles.polaroid(photo)}>
+          <div key={index} className="polaroid-signin" style={styles.polaroid(photo)}>
             <div style={styles.polaroidPin(photo.pinColor)}>
               <div style={styles.polaroidPinNeedle}></div>
             </div>
@@ -284,7 +319,8 @@ const Signin = () => {
           </div>
         ))}
         
-        <div 
+        <div
+          className="signin-card" 
           style={styles.cardWrap} 
           aria-labelledby="signin-heading"
           onMouseEnter={() => setIsHovered(true)}
@@ -296,7 +332,7 @@ const Signin = () => {
             <div style={styles.pinNeedle}></div>
           </div>
           
-          <h2 id="signin-heading" style={styles.heading}>Sign In</h2>
+          <h2 id="signin-heading" className="signin-heading" style={styles.heading}>Sign In</h2>
           <div style={styles.sub}>Enter your information below</div>
 
           <form aria-label="Sign in form" onSubmit={handleSubmit}>
@@ -309,6 +345,7 @@ const Signin = () => {
                 name="email" 
                 type="email" 
                 placeholder="Enter your email" 
+                className="signin-input"
                 style={styles.input}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -325,6 +362,7 @@ const Signin = () => {
                 name="password" 
                 type="password" 
                 placeholder="Enter your password" 
+                className="signin-input"
                 style={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -333,7 +371,7 @@ const Signin = () => {
               <a href="#" style={styles.forgotLink}>Forgot password?</a>
             </div>
 
-            <button type="submit" style={styles.button} disabled={loading}>
+            <button type="submit" className="signin-button" style={styles.button} disabled={loading}>
               {loading ? "Connecting..." : "Sign In"}
             </button>
             {status && (

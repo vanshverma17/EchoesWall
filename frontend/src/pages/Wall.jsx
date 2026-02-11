@@ -936,11 +936,121 @@ const Wall = ({ isNew = false }) => {
           color: #ffffff !important;
           transform: scale(1.1);
         }
+        
+        @media (max-width: 768px) {
+          .wall-page {
+            padding: 6px 8px !important;
+            overflow-x: hidden !important;
+          }
+          
+          .wall-header {
+            margin-bottom: 8px !important;
+          }
+          
+          .wall-title {
+            font-size: 24px !important;
+          }
+          
+          .wall-name-input {
+            font-size: 13px !important;
+            padding: 6px 10px !important;
+          }
+          
+          .status-row {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 8px !important;
+          }
+          
+          .floating-panel {
+            right: 8px !important;
+            gap: 6px !important;
+            transform: translateY(-50%) scale(0.85) !important;
+          }
+          
+          .note-btn,
+          .image-btn,
+          .thought-btn,
+          .clear-btn,
+          .save-btn {
+            min-width: 50px !important;
+            padding: 8px !important;
+            font-size: 10px !important;
+            gap: 4px !important;
+          }
+          
+          .note-btn svg,
+          .image-btn svg,
+          .thought-btn svg,
+          .clear-btn svg,
+          .save-btn svg {
+            width: 14px !important;
+            height: 14px !important;
+          }
+          
+          .canvas-wrap {
+            height: calc(100vh - 150px) !important;
+          }
+          
+          .canvas-area {
+            padding: 12px !important;
+          }
+          
+          .sticky-note {
+            padding: 8px 10px !important;
+            font-size: 11px !important;
+            max-width: 150px !important;
+          }
+          
+          .cloud {
+            padding: 10px 14px !important;
+            font-size: 11px !important;
+            max-width: 180px !important;
+          }
+          
+          .polaroid {
+            width: 120px !important;
+            padding: 8px 8px 28px 8px !important;
+          }
+          
+          .polaroid img {
+            width: 104px !important;
+            height: 100px !important;
+          }
+          
+          .zoom-controls {
+            bottom: 12px !important;
+            left: 12px !important;
+            gap: 6px !important;
+          }
+          
+          .zoom-btn {
+            width: 32px !important;
+            height: 32px !important;
+            font-size: 16px !important;
+          }
+          
+          .board-camera {
+            bottom: 12px !important;
+            right: 12px !important;
+            padding: 8px 14px !important;
+            font-size: 12px !important;
+          }
+          
+          .modal-content {
+            padding: 20px !important;
+            max-width: 90vw !important;
+          }
+          
+          .modal-title {
+            font-size: 18px !important;
+          }
+        }
       `}</style>
       
-      <div style={styles.page}>
+      <div className="wall-page" style={styles.page}>
         {/* Floating Action Buttons */}
-        <div style={styles.floatingPanel}>
+        <div className="floating-panel" style={styles.floatingPanel}>
           <button className="save-btn" style={styles.saveBtn} onClick={saveWall} title="Save Wall">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
@@ -979,10 +1089,11 @@ const Wall = ({ isNew = false }) => {
           </button>
         </div>
 
-        <div style={styles.header}>
-          <div style={styles.statusRow}>
-            <h2 style={styles.title}>Create Your Wall</h2>
+        <div className="wall-header" style={styles.header}>
+          <div className="status-row" style={styles.statusRow}>
+            <h2 className="wall-title" style={styles.title}>Create Your Wall</h2>
             <input
+              className="wall-name-input"
               style={styles.wallNameInput}
               value={wallTitle}
               onChange={(e) => setWallTitle(e.target.value)}
@@ -1014,7 +1125,7 @@ const Wall = ({ isNew = false }) => {
           {error && <div style={styles.errorBanner}>{error}</div>}
         </div>
 
-        <div style={styles.canvasWrap}>
+        <div className="canvas-wrap" style={styles.canvasWrap}>
           <div
             ref={canvasRef}
             className="canvas-area"
@@ -1076,7 +1187,7 @@ const Wall = ({ isNew = false }) => {
             </div>
             
             {/* Zoom Controls */}
-            <div style={styles.zoomControls}>
+            <div className="zoom-controls" style={styles.zoomControls}>
               <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomOut} title="Zoom Out">
                 −
               </button>
@@ -1109,8 +1220,8 @@ const Wall = ({ isNew = false }) => {
         {/* Modal Overlay */}
         {showModal && (
           <div style={styles.overlay} onClick={closeModal}>
-            <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
-              <h3 style={styles.modalTitle}>
+            <div className="modal-content" style={styles.modal} onClick={(e) => e.stopPropagation()}>
+              <h3 className="modal-title" style={styles.modalTitle}>
                 {modalType === "note" && "Add a New Note"}
                 {modalType === "image" && "Add a New Image"}
                 {modalType === "thought" && "Add a New Thought"}

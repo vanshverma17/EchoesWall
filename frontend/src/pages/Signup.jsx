@@ -265,10 +265,45 @@ const Signup = () => {
         a:hover {
           color: #6a7bc5 !important;
         }
+        
+        @media (max-width: 768px) {
+          .signup-page {
+            padding: 20px !important;
+            overflow-x: hidden !important;
+          }
+          
+          .polaroid-signup {
+            width: 120px !important;
+            padding: 8px 8px 28px 8px !important;
+          }
+          
+          .polaroid-signup img {
+            height: 100px !important;
+          }
+          
+          .signup-card {
+            padding: 36px 28px !important;
+            max-width: 95vw !important;
+          }
+          
+          .signup-heading {
+            font-size: 28px !important;
+          }
+          
+          .signup-input {
+            font-size: 14px !important;
+            padding: 10px 12px !important;
+          }
+          
+          .signup-button {
+            padding: 12px !important;
+            font-size: 15px !important;
+          }
+        }
       `}</style>
-      <div style={styles.page}>
+      <div className="signup-page" style={styles.page}>
         {polaroidPhotos.map((photo, index) => (
-          <div key={index} style={styles.polaroid(photo)}>
+          <div key={index} className="polaroid-signup" style={styles.polaroid(photo)}>
             <div style={styles.polaroidPin(photo.pinColor)}>
               <div style={styles.polaroidPinNeedle}></div>
             </div>
@@ -276,7 +311,8 @@ const Signup = () => {
           </div>
         ))}
         
-        <div 
+        <div
+          className="signup-card" 
           style={styles.cardWrap} 
           aria-labelledby="signup-heading"
           onMouseEnter={() => setIsHovered(true)}
@@ -288,7 +324,7 @@ const Signup = () => {
             <div style={styles.pinNeedle}></div>
           </div>
           
-          <h2 id="signup-heading" style={styles.heading}>Sign Up</h2>
+          <h2 id="signup-heading" className="signup-heading" style={styles.heading}>Sign Up</h2>
           <div style={styles.sub}>Create your account below</div>
 
           <form aria-label="Sign up form" onSubmit={handleSubmit}>
@@ -301,6 +337,7 @@ const Signup = () => {
                 name="fullname" 
                 type="text" 
                 placeholder="Enter your full name" 
+                className="signup-input"
                 style={styles.input}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
@@ -317,6 +354,7 @@ const Signup = () => {
                 name="email" 
                 type="email" 
                 placeholder="Enter your email" 
+                className="signup-input"
                 style={styles.input}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
@@ -333,6 +371,7 @@ const Signup = () => {
                 name="password" 
                 type="password" 
                 placeholder="Enter your password" 
+                className="signup-input"
                 style={styles.input}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -340,7 +379,7 @@ const Signup = () => {
               />
             </div>
 
-            <button type="submit" style={styles.button} disabled={loading}>
+            <button type="submit" className="signup-button" style={styles.button} disabled={loading}>
               {loading ? "Connecting..." : "Sign Up"}
             </button>
             {status && (
