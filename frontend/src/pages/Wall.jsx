@@ -266,12 +266,20 @@ const Wall = ({ isNew = false }) => {
     }
   };
 
+  const getEventCoords = (e) => {
+    if (e.touches && e.touches[0]) {
+      return { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    }
+    return { x: e.clientX, y: e.clientY };
+  };
+
   const handleMouseDown = (e, id) => {
     if (e.target.tagName === 'BUTTON') return;
     e.preventDefault();
     const el = e.currentTarget;
     const rect = el.getBoundingClientRect();
-    const offset = { x: e.clientX - rect.left, y: e.clientY - rect.top };
+    const coords = getEventCoords(e);
+    const offset = { x: coords.x - rect.left, y: coords.y - rect.top };
     setDragOffset(offset);
     const computed = window.getComputedStyle(el);
     const origLeft = parseFloat(computed.left) || 0;
@@ -293,8 +301,9 @@ const Wall = ({ isNew = false }) => {
     const canvas = document.querySelector('.canvas-area');
     if (!canvas) return;
     const canvasRect = canvas.getBoundingClientRect();
-    const newLeft = Math.max(0, e.clientX - canvasRect.left - dragOffset.x);
-    const newTop = Math.max(0, e.clientY - canvasRect.top - dragOffset.y);
+    const coords = getEventCoords(e);
+    const newLeft = Math.max(0, coords.x - canvasRect.left - dragOffset.x);
+    const newTop = Math.max(0, coords.y - canvasRect.top - dragOffset.y);
 
     // Apply position directly for smooth, crisp dragging
     el.style.left = `${newLeft}px`;
@@ -519,7 +528,7 @@ const Wall = ({ isNew = false }) => {
       overflow: "hidden",
     },
     boardCamera: {
-      position: "absolute",
+      position: "fixed",
       right: "18px",
       bottom: "18px",
       background: "linear-gradient(135deg, #ffffff 0%, #f4f6ff 100%)",
@@ -535,7 +544,7 @@ const Wall = ({ isNew = false }) => {
       color: "#4752c4",
       border: "1px solid rgba(90, 103, 216, 0.15)",
       cursor: "pointer",
-      zIndex: 150,
+      zIndex: 200,
       transition: "all 0.2s ease",
     },
     boardCameraText: {
@@ -544,7 +553,7 @@ const Wall = ({ isNew = false }) => {
       color: "#4752c4",
     },
     zoomControls: {
-      position: "absolute",
+      position: "fixed",
       bottom: "20px",
       left: "20px",
       display: "flex",
@@ -554,7 +563,7 @@ const Wall = ({ isNew = false }) => {
       padding: "8px",
       borderRadius: "12px",
       boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
-      zIndex: 50,
+      zIndex: 200,
     },
     zoomBtn: {
       width: "32px",
@@ -937,35 +946,46 @@ const Wall = ({ isNew = false }) => {
           transform: scale(1.1);
         }
         
+        .zoom-controls,
+        .board-camera {
+          pointer-events: auto;
+          user-select: none;
+        }
+        
         @media (max-width: 768px) {
           .wall-page {
-            padding: 6px 8px !important;
+            padding: 4px !important;
             overflow-x: hidden !important;
+            height: 100vh !important;
           }
           
           .wall-header {
-            margin-bottom: 8px !important;
+            margin-bottom: 4px !important;
+            padding: 8px !important;
           }
           
           .wall-title {
-            font-size: 24px !important;
+            font-size: 20px !important;
           }
           
           .wall-name-input {
-            font-size: 13px !important;
-            padding: 6px 10px !important;
+            font-size: 12px !important;
+            padding: 8px 10px !important;
+            min-width: 140px !important;
           }
           
           .status-row {
-            flex-direction: column !important;
-            align-items: flex-start !important;
-            gap: 8px !important;
+            flex-wrap: wrap !important;
+            gap: 6px !important;
           }
           
           .floating-panel {
-            right: 8px !important;
-            gap: 6px !important;
-            transform: translateY(-50%) scale(0.85) !important;
+            position: fixed !important;
+            right: 4px !important;
+            top: 50% !important;
+            transform: translateY(-50%) !important;
+            gap: 4px !important;
+            z-index: 200 !important;
           }
           
           .note-btn,
@@ -973,10 +993,12 @@ const Wall = ({ isNew = false }) => {
           .thought-btn,
           .clear-btn,
           .save-btn {
-            min-width: 50px !important;
-            padding: 8px !important;
-            font-size: 10px !important;
-            gap: 4px !important;
+            min-width: 44px !important;
+            min-height: 44px !important;
+            padding: 6px !important;
+            font-size: 9px !important;
+            gap: 2px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
           }
           
           .note-btn svg,
@@ -984,66 +1006,146 @@ const Wall = ({ isNew = false }) => {
           .thought-btn svg,
           .clear-btn svg,
           .save-btn svg {
-            width: 14px !important;
-            height: 14px !important;
+            width: 16px !important;
+            height: 16px !important;
           }
           
           .canvas-wrap {
-            height: calc(100vh - 150px) !important;
+            height: calc(100vh - 100px) !important;
+            border-radius: 12px !important;
+            margin: 4px !important;
           }
           
           .canvas-area {
-            padding: 12px !important;
+            padding: 8px !important;
+            touch-action: none !important;
           }
           
           .sticky-note {
-            padding: 8px 10px !important;
-            font-size: 11px !important;
-            max-width: 150px !important;
+            padding: 10px 12px 32px 12px !important;
+            font-size: 12px !important;
+            min-width: 140px !important;
+            width: 140px !important;
+            touch-action: none !important;
           }
           
           .cloud {
-            padding: 10px 14px !important;
-            font-size: 11px !important;
-            max-width: 180px !important;
+            padding: 12px 16px !important;
+            font-size: 12px !important;
+            max-width: 160px !important;
+            touch-action: none !important;
           }
           
           .polaroid {
-            width: 120px !important;
-            padding: 8px 8px 28px 8px !important;
+            padding: 10px 10px 32px 10px !important;
+            touch-action: none !important;
           }
           
           .polaroid img {
-            width: 104px !important;
-            height: 100px !important;
+            width: 120px !important;
+            height: 110px !important;
           }
           
           .zoom-controls {
-            bottom: 12px !important;
-            left: 12px !important;
-            gap: 6px !important;
+            bottom: 70px !important;
+            left: 8px !important;
+            gap: 4px !important;
+            padding: 6px !important;
+            position: fixed !important;
           }
           
           .zoom-btn {
-            width: 32px !important;
-            height: 32px !important;
-            font-size: 16px !important;
+            width: 36px !important;
+            height: 36px !important;
+            font-size: 18px !important;
+            min-width: 36px !important;
+          }
+          
+          .zoom-level {
+            font-size: 11px !important;
+            padding: 0 6px !important;
           }
           
           .board-camera {
-            bottom: 12px !important;
-            right: 12px !important;
-            padding: 8px 14px !important;
-            font-size: 12px !important;
+            bottom: 8px !important;
+            right: 8px !important;
+            left: 8px !important;
+            padding: 10px 12px !important;
+            font-size: 11px !important;
+            justify-content: center !important;
+            position: fixed !important;
+          }
+          
+          .board-camera-text {
+            font-size: 11px !important;
+          }
+          
+          .board-camera svg {
+            width: 16px !important;
+            height: 16px !important;
           }
           
           .modal-content {
             padding: 20px !important;
+            min-width: 90vw !important;
             max-width: 90vw !important;
+            margin: 16px !important;
+            border-radius: 16px !important;
           }
           
           .modal-title {
+            font-size: 20px !important;
+            margin-bottom: 16px !important;
+          }
+          
+          .item-delete-btn {
+            opacity: 1 !important;
+            pointer-events: auto !important;
+          }
+          
+          .saved-indicator,
+          .unsaved-indicator {
+            font-size: 10px !important;
+            padding: 6px 10px !important;
+          }
+          
+          .error-banner {
+            font-size: 11px !important;
+            padding: 6px 10px !important;
+          }
+        }
+        
+        @media (max-width: 480px) {
+          .wall-title {
             font-size: 18px !important;
+          }
+          
+          .status-row {
+            font-size: 11px !important;
+          }
+          
+          .floating-panel {
+            right: 2px !important;
+          }
+          
+          .canvas-wrap {
+            height: calc(100vh - 90px) !important;
+          }
+          
+          .sticky-note {
+            width: 120px !important;
+            min-width: 120px !important;
+            font-size: 11px !important;
+          }
+          
+          .cloud {
+            max-width: 140px !important;
+            font-size: 11px !important;
+          }
+          
+          .polaroid img {
+            width: 100px !important;
+            height: 90px !important;
           }
         }
       `}</style>
@@ -1133,6 +1235,8 @@ const Wall = ({ isNew = false }) => {
             onMouseMove={handleMouseMove}
             onMouseUp={handleMouseUp}
             onMouseLeave={handleMouseUp}
+            onTouchMove={handleMouseMove}
+            onTouchEnd={handleMouseUp}
           >
             <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
               {loading ? (
@@ -1141,7 +1245,13 @@ const Wall = ({ isNew = false }) => {
                 items.map((it) => {
                 if (it.type === "note") {
                   return (
-                    <div key={it.id} className="sticky-note" style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                    <div 
+                      key={it.id} 
+                      className="sticky-note" 
+                      style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
                       <div style={{...styles.pin, background: getRandomPinColor()}}>
                         <div style={styles.pinNeedle}></div>
                       </div>
@@ -1155,7 +1265,13 @@ const Wall = ({ isNew = false }) => {
 
                 if (it.type === "thought") {
                   return (
-                    <div key={it.id} className="cloud" style={{...styles.cloud, background: it.color || "#ffffff", top: it.top, left: it.left}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                    <div 
+                      key={it.id} 
+                      className="cloud" 
+                      style={{...styles.cloud, background: it.color || "#ffffff", top: it.top, left: it.left}} 
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
                       <div style={{...styles.pin, background: getRandomPinColor()}}>
                         <div style={styles.pinNeedle}></div>
                       </div>
@@ -1169,7 +1285,13 @@ const Wall = ({ isNew = false }) => {
 
                 if (it.type === "image") {
                   return (
-                    <div key={it.id} className="polaroid" style={{...styles.polaroid, top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} onMouseDown={(e) => handleMouseDown(e, it.id)}>
+                    <div 
+                      key={it.id} 
+                      className="polaroid" 
+                      style={{...styles.polaroid, top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
                       <div style={{...styles.pin, background: getRandomPinColor()}}>
                         <div style={styles.pinNeedle}></div>
                       </div>
@@ -1185,36 +1307,36 @@ const Wall = ({ isNew = false }) => {
               })
               )}
             </div>
-            
-            {/* Zoom Controls */}
-            <div className="zoom-controls" style={styles.zoomControls}>
-              <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomOut} title="Zoom Out">
-                −
-              </button>
-              <div style={styles.zoomLevel}>{Math.round(zoom * 100)}%</div>
-              <button className="zoom-btn" style={styles.zoomBtn} onClick={resetZoom} title="Reset Zoom">
-                ⟲
-              </button>
-              <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomIn} title="Zoom In">
-                +
-              </button>
-            </div>
-
-            <button
-              className="board-camera"
-              style={styles.boardCamera}
-              onClick={downloadBoardImage}
-              disabled={exporting}
-              data-html2canvas-ignore="true"
-              title="Save board to your device"
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                <circle cx="12" cy="13" r="4"></circle>
-              </svg>
-              <span style={styles.boardCameraText}>{exporting ? "Saving..." : "Board Camera"}</span>
+          </div>
+          
+          {/* Zoom Controls - Fixed Position */}
+          <div className="zoom-controls" style={styles.zoomControls} data-html2canvas-ignore="true">
+            <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomOut} title="Zoom Out">
+              −
+            </button>
+            <div style={styles.zoomLevel}>{Math.round(zoom * 100)}%</div>
+            <button className="zoom-btn" style={styles.zoomBtn} onClick={resetZoom} title="Reset Zoom">
+              ⟲
+            </button>
+            <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomIn} title="Zoom In">
+              +
             </button>
           </div>
+
+          <button
+            className="board-camera"
+            style={styles.boardCamera}
+            onClick={downloadBoardImage}
+            disabled={exporting}
+            data-html2canvas-ignore="true"
+            title="Save board to your device"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+              <circle cx="12" cy="13" r="4"></circle>
+            </svg>
+            <span style={styles.boardCameraText}>{exporting ? "Saving..." : "Board Camera"}</span>
+          </button>
         </div>
 
         {/* Modal Overlay */}
