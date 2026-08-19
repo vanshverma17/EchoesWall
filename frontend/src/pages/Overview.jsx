@@ -194,47 +194,7 @@ const Overview = () => {
       borderRadius: "50%",
       boxShadow: "0 3px 8px rgba(0, 0, 0, 0.25), inset 0 1px 2px rgba(255, 255, 255, 0.4)",
     },
-    camera: {
-      position: "absolute",
-      bottom: "20px",
-      left: "20px",
-      background: "rgba(255, 255, 255, 0.95)",
-      backdropFilter: "blur(10px)",
-      padding: "8px 14px",
-      borderRadius: "10px",
-      boxShadow: "0 3px 12px rgba(0, 0, 0, 0.06)",
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-      fontSize: "16px",
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
-    },
-    cameraText: {
-      fontSize: "13px",
-      fontWeight: 500,
-      color: "#5a67d8",
-    },
-    editButton: {
-      position: "absolute",
-      bottom: "18px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      background: "#ffffff",
-      color: "#7b8cd9",
-      padding: "8px 20px",
-      borderRadius: "10px",
-      border: "none",
-      cursor: "pointer",
-      boxShadow: "0 4px 16px rgba(123, 140, 217, 0.12), 0 2px 4px rgba(0, 0, 0, 0.04)",
-      fontSize: "13px",
-      fontWeight: 600,
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-      transition: "all 0.3s ease",
-    },
+
     sidebar: {
       display: "flex",
       flexDirection: "column",
@@ -620,17 +580,7 @@ const Overview = () => {
           box-shadow: 0 12px 28px rgba(0, 0, 0, 0.15), 0 4px 10px rgba(0, 0, 0, 0.1) !important;
         }
         
-        .camera-icon:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
-        }
-        
-        .edit-btn:hover {
-          background: linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%) !important;
-          color: white !important;
-          transform: translateX(-50%) translateY(-2px) !important;
-        }
-        
+
         .recent-item:hover {
           background: rgba(123, 140, 217, 0.06);
           transform: translateX(4px);
@@ -763,23 +713,7 @@ const Overview = () => {
             flex-direction: row !important;
           }
           
-          .camera-icon {
-            bottom: 12px !important;
-            left: 12px !important;
-            padding: 6px 10px !important;
-            font-size: 10px !important;
-          }
-          
-          .camera-icon svg {
-            width: 14px !important;
-            height: 14px !important;
-          }
-          
-          .edit-btn {
-            bottom: 12px !important;
-            padding: 6px 16px !important;
-            font-size: 11px !important;
-          }
+
         }
       `}</style>
       <div className="overview-page" style={styles.page}>
@@ -872,23 +806,7 @@ const Overview = () => {
               <div style={{...styles.pin, top: "314px", left: "440px", background: "#5c6bc0"}}></div>
               <div style={{...styles.pin, top: "354px", left: "590px", background: "#66bb6a"}}></div>
 
-              {/* Camera */}
-              <div className="camera-icon" style={styles.camera}>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                  <circle cx="12" cy="13" r="4"></circle>
-                </svg>
-                <span style={styles.cameraText}>Board Camera</span>
-              </div>
 
-              {/* Edit Button */}
-              <button className="edit-btn" style={styles.editButton}>
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                </svg>
-                Edit Board
-              </button>
             </div>
           </div>
 
