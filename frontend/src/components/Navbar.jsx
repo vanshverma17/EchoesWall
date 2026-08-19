@@ -48,7 +48,7 @@ const Navbar = () => {
         }
       `}</style>
       <nav className="flex justify-between items-center px-4 py-1.5 md:px-10 md:py-2 bg-[#eff2f5] backdrop-blur-[30px] saturate-[200%] brightness-[110%] shadow-[0_1px_8px_rgba(0,0,0,0.04),0_4px_16px_rgba(123,140,217,0.08)] border-b border-[rgba(255,255,255,0.6)] sticky top-0 z-[100]">
-        <Link to="/overview" className="font-['Dancing_Script',cursive] text-[22px] md:text-[28px] text-[#7b8cd9] font-bold no-underline transition-all duration-300 ease hover:text-[#6a7bc5] hover:scale-105">
+        <Link to="/overview" className="font-dancing text-[22px] md:text-[28px] text-[#7b8cd9] font-normal no-underline transition-all duration-300 ease hover:text-[#6a7bc5] hover:scale-105">
           Echoes
         </Link>
         <div className="flex gap-3 md:gap-6 items-center">
@@ -68,7 +68,7 @@ const Navbar = () => {
                 <svg className="hidden md:inline transition-transform duration-200 ease" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#4a5568" strokeWidth="2" style={{ transform: showDropdown ? "rotate(180deg)" : "rotate(0deg)" }}>
                   <polyline points="6 9 12 15 18 9"></polyline>
                 </svg>
-                
+
                 {showDropdown && (
                   <div className="absolute top-[calc(100%+8px)] right-0 bg-white rounded-xl shadow-[0_8px_24px_rgba(123,140,217,0.15),0_2px_8px_rgba(0,0,0,0.08)] border border-[rgba(123,140,217,0.1)] min-w-[200px] overflow-hidden z-[1000] animate-slideDown" onClick={(e) => e.stopPropagation()}>
                     <div className="p-[12px_16px] border-b border-[rgba(123,140,217,0.1)] bg-[rgba(123,140,217,0.03)]">

@@ -33,17 +33,17 @@ const Landing = () => {
   return (
     <div className="min-h-screen max-h-screen w-screen max-w-[100vw] flex items-center justify-center bg-[linear-gradient(135deg,#e8eef7_0%,#dfe7f2_50%,#f0f4f9_100%)] p-5 md:p-10 relative overflow-hidden box-border">
       {polaroidPhotos.map((photo, index) => (
-        <div 
-          key={index} 
+        <div
+          key={index}
           className="absolute w-[150px] md:w-[220px] bg-white p-2 pb-8 md:p-3 md:pb-12 rounded shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.1)] z-10 transition-all duration-300 ease-out cursor-pointer hover:z-50 hover:!rotate-0 hover:scale-105 hover:shadow-[0_8px_24px_rgba(0,0,0,0.25),0_12px_36px_rgba(0,0,0,0.15)]"
-          style={{ 
+          style={{
             top: photo.top, left: photo.left, right: photo.right, bottom: photo.bottom,
             transform: `rotate(${photo.rotate}deg)`,
             animation: `floatIn 1s ease-out ${photo.delay}s both, float 6s ease-in-out infinite ${photo.delay}s`,
             '--rotation': `${photo.rotate}deg`
           }}
         >
-          <div 
+          <div
             className="absolute -top-2 left-1/2 -translate-x-1/2 w-5 h-5 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)] z-20"
             style={{ background: photo.pinColor }}
           >
@@ -57,7 +57,7 @@ const Landing = () => {
         <div className="absolute -top-2.5 left-1/2 -translate-x-1/2 w-[22px] h-[22px] bg-[#7bc9a3] rounded-full shadow-[0_2px_5px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)] z-50">
           <div className="absolute w-[2px] h-2 bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[18px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
         </div>
-        <h1 className="font-dancing text-[48px] md:text-[72px] text-[#7b8cd9] mb-4 font-bold">Echoes</h1>
+        <h1 className="font-dancing text-[48px] md:text-[72px] text-[#7b8cd9] mb-4 font-normal">Echoes</h1>
         <p className="text-[16px] md:text-[18px] text-[#8b94a8] mb-4 leading-relaxed">
           A quiet place to<br />pin moments that matter.
         </p>
@@ -65,8 +65,8 @@ const Landing = () => {
           {status}
           {userName ? ` • Hello, ${userName.split(" ")[0]}` : ""}
         </div>
-        <Link 
-          to="/signin" 
+        <Link
+          to="/signin"
           className="inline-block py-[14px] px-10 md:py-4 md:px-[60px] text-[15px] md:text-[16px] font-semibold rounded-full no-underline bg-[#7b8cd9] text-white shadow-[0_4px_12px_rgba(123,140,217,0.3)] transition-all duration-300 ease-in-out border-none cursor-pointer hover:bg-[#6a7bc5] hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_6px_20px_rgba(123,140,217,0.4)]"
         >
           Get Started
