@@ -1,14 +1,24 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:4000").replace(/\/+$/, "");
 
 const handleResponse = async (response) => {
-  if (!response.ok) {
-    const message = await response.text();
-    throw new Error(message || "Request failed");
-  }
   if (response.status === 204) {
     return null;
   }
-  return response.json();
+  let data = null;
+  let text = "";
+  try {
+    text = await response.text();
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+
+  if (!response.ok) {
+    const message = data?.message || text || (response.statusText ? `${response.status} ${response.statusText}` : "Request failed");
+    throw new Error(message);
+  }
+
+  return data;
 };
 
 const normalizeEcho = (doc = {}) => ({
@@ -35,7 +45,7 @@ export const fetchEchoes = async (options = {}) => {
   const { signal, history = false, userId } = options;
 
   if (!userId) {
-    return history ? [] : [];
+    return history ? [] : normalizeSnapshot({});
   }
 
   if (history) {
@@ -46,15 +56,21 @@ export const fetchEchoes = async (options = {}) => {
       return Array.isArray(data) ? data.map(normalizeSnapshot) : [];
     } catch {
       // Fallback for servers that don't expose /api/walls
-      const latestEchoes = await handleResponse(await fetch(`${API_BASE_URL}/api/echoes`, { signal }));
-      if (!Array.isArray(latestEchoes)) return [];
-      return [
-        normalizeSnapshot({
-          items: latestEchoes,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
-        }),
-      ];
+      try {
+        const latestEchoes = await handleResponse(
+          await fetch(`${API_BASE_URL}/api/echoes?userId=${encodeURIComponent(userId)}`, { signal })
+        );
+        if (!Array.isArray(latestEchoes)) return [];
+        return [
+          normalizeSnapshot({
+            items: latestEchoes,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString(),
+          }),
+        ];
+      } catch {
+        return [];
+      }
     }
   }
 
@@ -66,10 +82,14 @@ export const fetchEchoes = async (options = {}) => {
     return normalized;
   } catch {
     // Fallback to legacy echoes list
-    const latestEchoes = await handleResponse(
-      await fetch(`${API_BASE_URL}/api/echoes?userId=${encodeURIComponent(userId)}`, { signal })
-    );
-    return normalizeSnapshot({ items: Array.isArray(latestEchoes) ? latestEchoes.map(normalizeEcho) : [] });
+    try {
+      const latestEchoes = await handleResponse(
+        await fetch(`${API_BASE_URL}/api/echoes?userId=${encodeURIComponent(userId)}`, { signal })
+      );
+      return normalizeSnapshot({ items: Array.isArray(latestEchoes) ? latestEchoes.map(normalizeEcho) : [] });
+    } catch {
+      return normalizeSnapshot({});
+    }
   }
 };
 

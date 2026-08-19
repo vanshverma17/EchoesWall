@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import { pingAuth, getStoredUser } from "../services/authApi";
+import LazyImage from "../components/LazyImage";
 
 const Landing = () => {
   const polaroidPhotos = [
@@ -15,20 +15,6 @@ const Landing = () => {
     { img: "https://images.unsplash.com/photo-1574158622682-e40e69881006?w=300", bottom: "18%", right: "8%", rotate: 6, pinColor: "#7bc9a3", delay: 0.8 },
     { img: "https://images.unsplash.com/photo-1542327897-d73f4005b533?w=300", bottom: "5%", right: "25%", rotate: -12, pinColor: "#d98bb8", delay: 0.9 },
   ];
-
-  const [status, setStatus] = React.useState("Checking backend...");
-  const [userName, setUserName] = React.useState("");
-
-  React.useEffect(() => {
-    const user = getStoredUser();
-    if (user?.name || user?.email) {
-      setUserName(user.name || user.email);
-    }
-
-    pingAuth()
-      .then(() => setStatus("Backend connected"))
-      .catch(() => setStatus("Backend unavailable"));
-  }, []);
 
   return (
     <div className="min-h-screen max-h-screen w-screen max-w-[100vw] flex items-center justify-center bg-[linear-gradient(135deg,#e8eef7_0%,#dfe7f2_50%,#f0f4f9_100%)] p-5 md:p-10 relative overflow-hidden box-border">
@@ -49,7 +35,7 @@ const Landing = () => {
           >
             <div className="absolute w-[2px] h-2 bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-4 -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
           </div>
-          <img src={photo.img} alt="" className="w-full h-[130px] md:h-[200px] object-cover block bg-[#f0f0f0]" />
+          <LazyImage src={photo.img} alt="Memory polaroid" className="w-full h-[130px] md:h-[200px] rounded-[2px]" />
         </div>
       ))}
 

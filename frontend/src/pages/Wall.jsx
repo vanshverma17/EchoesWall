@@ -1,7 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, Suspense, lazy } from "react";
 import { useLocation, useParams } from "react-router-dom";
 import { fetchEchoes, saveEchoes, deleteAllEchoes, fetchWallSnapshot } from "../services/echoesApi";
 import { getStoredUser } from "../services/authApi";
+import LazyImage from "../components/LazyImage";
+
+const WallModal = lazy(() => import("../components/WallModal"));
 
 const PIN_COLORS = ["#7ba3d9", "#8b9fd9", "#ff8c69", "#d98bb8", "#7bc9a3", "#ffd166", "#ef6b6b"];
 
@@ -51,7 +54,7 @@ const Wall = ({ isNew = false }) => {
     const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
     const top = Math.floor(40 + Math.random() * 400);
     const left = Math.floor(40 + Math.random() * 600);
-    
+
     if (modalType === "image" && uploadedFile) {
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -165,11 +168,11 @@ const Wall = ({ isNew = false }) => {
       }
       const normalized = Array.isArray(existing)
         ? existing
-            .filter((it) => it && it.type)
-            .map((it) => ({
-              ...it,
-              id: it.id || it._id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
-            }))
+          .filter((it) => it && it.type)
+          .map((it) => ({
+            ...it,
+            id: it.id || it._id || `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+          }))
         : [];
       setItems(normalized);
       if (snapshotMeta?.title !== undefined) {
@@ -297,7 +300,7 @@ const Wall = ({ isNew = false }) => {
     if (!dragging || !draggingMetaRef.current) return;
     const el = elRef.current;
     if (!el) return;
-    
+
     const canvas = document.querySelector('.canvas-area');
     if (!canvas) return;
     const canvasRect = canvas.getBoundingClientRect();
@@ -307,7 +310,7 @@ const Wall = ({ isNew = false }) => {
 
     el.style.left = `${newLeft}px`;
     el.style.top = `${newTop}px`;
-    
+
     draggingMetaRef.current = { ...draggingMetaRef.current, newLeft, newTop };
   };
 
@@ -343,59 +346,59 @@ const Wall = ({ isNew = false }) => {
     <div className="h-screen w-screen p-1 md:p-2 lg:p-4 box-border font-sans bg-[linear-gradient(to_bottom_right,#e8f6ff_0%,#f5fbff_50%,#ffffff_100%)] flex flex-col overflow-hidden">
       {/* Floating Action Buttons */}
       <div className="fixed right-1 md:right-5 top-1/2 -translate-y-1/2 flex flex-col gap-1 md:gap-2.5 z-[100] md:z-[100] z-[200]">
-        <button 
-          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#66bb6a] bg-[#66bb6a] text-white cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(102,187,106,0.3)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:bg-[#57a85b] hover:shadow-[0_6px_16px_rgba(102,187,106,0.4)] hover:-translate-x-1 hover:scale-105" 
-          onClick={saveWall} 
+        <button
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#66bb6a] bg-[#66bb6a] text-white cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(102,187,106,0.3)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:bg-[#57a85b] hover:shadow-[0_6px_16px_rgba(102,187,106,0.4)] hover:-translate-x-1 hover:scale-105"
+          onClick={saveWall}
           title="Save Wall"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
-            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-            <polyline points="17 21 17 13 7 13 7 21"/>
-            <polyline points="7 3 7 8 15 8"/>
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+            <polyline points="17 21 17 13 7 13 7 21" />
+            <polyline points="7 3 7 8 15 8" />
           </svg>
           <span>Save</span>
         </button>
-        <button 
-          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
-          onClick={() => openModal("note")} 
+        <button
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105"
+          onClick={() => openModal("note")}
           title="Add Note"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
           </svg>
           <span>Note</span>
         </button>
-        <button 
-          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
-          onClick={() => openModal("image")} 
+        <button
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105"
+          onClick={() => openModal("image")}
           title="Add Image"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-            <circle cx="8.5" cy="8.5" r="1.5"/>
-            <polyline points="21 15 16 10 5 21"/>
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
           </svg>
           <span>Image</span>
         </button>
-        <button 
-          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
-          onClick={() => openModal("thought")} 
+        <button
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105"
+          onClick={() => openModal("thought")}
           title="Add Thought"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
           </svg>
           <span>Thought</span>
         </button>
-        <button 
-          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#ef6b6b] bg-white text-[#ef6b6b] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#ef6b6b] hover:bg-[#fff5f5] hover:shadow-[0_6px_16px_rgba(239,107,107,0.3)] hover:-translate-x-1 hover:scale-105" 
-          onClick={clearAll} 
+        <button
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#ef6b6b] bg-white text-[#ef6b6b] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#ef6b6b] hover:bg-[#fff5f5] hover:shadow-[0_6px_16px_rgba(239,107,107,0.3)] hover:-translate-x-1 hover:scale-105"
+          onClick={clearAll}
           title="Clear All"
         >
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
-            <polyline points="3 6 5 6 21 6"/>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+            <polyline points="3 6 5 6 21 6" />
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
           </svg>
           <span>Clear</span>
         </button>
@@ -446,77 +449,77 @@ const Wall = ({ isNew = false }) => {
           onTouchMove={handleMouseMove}
           onTouchEnd={handleMouseUp}
         >
-          <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
+          <div style={{ transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative" }}>
             {loading ? (
               <div className="p-4 text-[#4a5568] font-semibold">Loading your wall...</div>
             ) : (
               items.map((it) => {
-              if (it.type === "note") {
-                return (
-                  <div 
-                    key={it.id} 
-                    className="group absolute p-[10px_12px_32px_12px] md:p-[14px_16px_40px_16px] rounded-[2px] shadow-[0_6px_18px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] text-[11px] md:text-[13px] leading-[1.6] font-kalam cursor-move transition-all duration-300 ease-in w-[120px] md:w-[180px] min-w-[120px] md:min-w-0 border-none touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-50" 
-                    style={{background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
-                    onMouseDown={(e) => handleMouseDown(e, it.id)}
-                    onTouchStart={(e) => handleMouseDown(e, it.id)}
-                  >
-                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
-                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                if (it.type === "note") {
+                  return (
+                    <div
+                      key={it.id}
+                      className="group absolute p-[10px_12px_32px_12px] md:p-[14px_16px_40px_16px] rounded-[2px] shadow-[0_6px_18px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] text-[11px] md:text-[13px] leading-[1.6] font-kalam cursor-move transition-all duration-300 ease-in w-[120px] md:w-[180px] min-w-[120px] md:min-w-0 border-none touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-50"
+                      style={{ background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)` }}
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
+                      <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{ background: getRandomPinColor() }}>
+                        <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                      </div>
+                      <div className="mb-2.5 font-medium break-words">{it.text}</div>
+                      <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute left-1/2 -translate-x-1/2 bottom-2 p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <div className="mb-2.5 font-medium break-words">{it.text}</div>
-                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute left-1/2 -translate-x-1/2 bottom-2 p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              if (it.type === "thought") {
-                return (
-                  <div 
-                    key={it.id} 
-                    className="group absolute p-[12px_16px] md:p-[16px_20px] rounded-[50px] shadow-[0_6px_20px_rgba(0,0,0,0.08)] text-[11px] md:text-[13px] leading-[1.5] font-sans cursor-move transition-all duration-300 ease max-w-[140px] md:max-w-[220px] border-[2px] border-[rgba(0,0,0,0.08)] touch-none md:touch-auto hover:scale-105 hover:z-50" 
-                    style={{background: it.color || "#ffffff", top: it.top, left: it.left}} 
-                    onMouseDown={(e) => handleMouseDown(e, it.id)}
-                    onTouchStart={(e) => handleMouseDown(e, it.id)}
-                  >
-                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
-                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                if (it.type === "thought") {
+                  return (
+                    <div
+                      key={it.id}
+                      className="group absolute p-[12px_16px] md:p-[16px_20px] rounded-[50px] shadow-[0_6px_20px_rgba(0,0,0,0.08)] text-[11px] md:text-[13px] leading-[1.5] font-sans cursor-move transition-all duration-300 ease max-w-[140px] md:max-w-[220px] border-[2px] border-[rgba(0,0,0,0.08)] touch-none md:touch-auto hover:scale-105 hover:z-50"
+                      style={{ background: it.color || "#ffffff", top: it.top, left: it.left }}
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
+                      <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{ background: getRandomPinColor() }}>
+                        <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                      </div>
+                      <div className="mb-2.5 font-medium text-[#2d3748] break-words">{it.text}</div>
+                      <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <div className="mb-2.5 font-medium text-[#2d3748] break-words">{it.text}</div>
-                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              if (it.type === "image") {
-                return (
-                  <div 
-                    key={it.id} 
-                    className="group absolute bg-white p-[10px_10px_32px_10px] md:p-[12px_12px_36px_12px] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_4px_8px_rgba(0,0,0,0.08)] rounded-[2px] cursor-move transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-[100] hover:shadow-[0_16px_40px_rgba(0,0,0,0.18)]" 
-                    style={{top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
-                    onMouseDown={(e) => handleMouseDown(e, it.id)}
-                    onTouchStart={(e) => handleMouseDown(e, it.id)}
-                  >
-                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
-                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                if (it.type === "image") {
+                  return (
+                    <div
+                      key={it.id}
+                      className="group absolute bg-white p-[10px_10px_32px_10px] md:p-[12px_12px_36px_12px] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_4px_8px_rgba(0,0,0,0.08)] rounded-[2px] cursor-move transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-[100] hover:shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
+                      style={{ top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)` }}
+                      onMouseDown={(e) => handleMouseDown(e, it.id)}
+                      onTouchStart={(e) => handleMouseDown(e, it.id)}
+                    >
+                      <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{ background: getRandomPinColor() }}>
+                        <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                      </div>
+                      <LazyImage src={it.src} alt="memory" className="w-[100px] h-[90px] md:w-[160px] md:h-[140px] rounded-[2px]" />
+                      <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute bottom-2 left-1/2 -translate-x-1/2 p-[4px_12px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                        Delete
+                      </button>
                     </div>
-                    <img src={it.src} alt="memory" className="w-[100px] h-[90px] md:w-[160px] md:h-[140px] object-cover block rounded-[2px]" />
-                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute bottom-2 left-1/2 -translate-x-1/2 p-[4px_12px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
-                      Delete
-                    </button>
-                  </div>
-                );
-              }
+                  );
+                }
 
-              return null;
-            })
+                return null;
+              })
             )}
           </div>
         </div>
-        
+
         {/* Zoom Controls - Fixed Position */}
         <div className="fixed flex bg-white/95 backdrop-blur-[10px] rounded-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.1)] z-[200] pointer-events-auto select-none bottom-[70px] md:bottom-5 left-2 md:left-5 gap-1 md:gap-2 p-1.5 md:p-2" data-html2canvas-ignore="true">
           <button className="w-9 h-9 md:w-8 md:h-8 min-w-[36px] md:min-w-[32px] rounded-[8px] border border-[rgba(123,140,217,0.3)] bg-white text-[#7b8cd9] cursor-pointer text-[18px] md:text-[16px] font-semibold flex items-center justify-center transition-all duration-200 ease hover:bg-[#7b8cd9] hover:text-white hover:scale-110" onClick={zoomOut} title="Zoom Out">
@@ -548,98 +551,17 @@ const Wall = ({ isNew = false }) => {
 
       {/* Modal Overlay */}
       {showModal && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-[4px] flex items-center justify-center z-[1000]" onClick={closeModal}>
-          <div className="bg-white/95 backdrop-blur-[20px] rounded-[16px] md:rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] min-w-[90vw] md:min-w-[400px] max-w-[90vw] md:max-w-[500px] p-5 md:p-8 m-4 md:m-0" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-[20px] md:text-[24px] font-bold mb-4 md:mb-6 text-[#2d3748] font-sans">
-              {modalType === "note" && "Add a New Note"}
-              {modalType === "image" && "Add a New Image"}
-              {modalType === "thought" && "Add a New Thought"}
-            </h3>
-            <form onSubmit={handleSubmit}>
-              {modalType === "image" ? (
-                <>
-                  <div className="mb-5">
-                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Upload Image</label>
-                    <label htmlFor="file-upload" className="w-full p-3 rounded-[10px] border-2 border-dashed border-[rgba(123,140,217,0.3)] bg-[rgba(123,140,217,0.05)] text-[#7b8cd9] cursor-pointer font-semibold text-[14px] transition-all duration-300 ease flex items-center justify-center gap-2">
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                        <polyline points="17 8 12 3 7 8"/>
-                        <line x1="12" y1="3" x2="12" y2="15"/>
-                      </svg>
-                      Choose Image from Device
-                    </label>
-                    <input
-                      id="file-upload"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleFileUpload}
-                    />
-                    {uploadedFile && (
-                      <div className="mt-3 p-3 rounded-[10px] bg-[rgba(102,187,106,0.1)] text-[#66bb6a] text-[13px] font-semibold flex items-center gap-2">
-                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <polyline points="20 6 9 17 4 12"/>
-                        </svg>
-                        {uploadedFile.name}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-3 my-4 text-[#a0aec0] text-[13px] font-medium">
-                    <div className="flex-1 h-px bg-[rgba(123,140,217,0.2)]"></div>
-                    <span>OR</span>
-                    <div className="flex-1 h-px bg-[rgba(123,140,217,0.2)]"></div>
-                  </div>
-                  <div className="mb-5">
-                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Image URL</label>
-                    <input
-                      type="url"
-                      className="w-full p-3 rounded-[10px] border border-[rgba(123,140,217,0.2)] text-[14px] font-inherit outline-none bg-white/80 text-[#2d3748] transition-all duration-300 ease box-border focus:border-[rgba(123,140,217,0.5)] focus:shadow-[0_0_0_3px_rgba(123,140,217,0.1)]"
-                      value={formData.url}
-                      onChange={(e) => {
-                        setFormData({ ...formData, url: e.target.value });
-                        setUploadedFile(null);
-                      }}
-                      placeholder="https://example.com/image.jpg"
-                      disabled={!!uploadedFile}
-                    />
-                  </div>
-                </>
-              ) : (
-                <>
-                  <div className="mb-5">
-                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">
-                      {modalType === "note" ? "Note Content" : "Thought Content"}
-                    </label>
-                    <textarea
-                      className="w-full p-3 rounded-[10px] border border-[rgba(123,140,217,0.2)] text-[14px] font-inherit resize-y min-h-[100px] outline-none bg-white/80 text-[#2d3748] transition-all duration-300 ease box-border focus:border-[rgba(123,140,217,0.5)] focus:shadow-[0_0_0_3px_rgba(123,140,217,0.1)]"
-                      value={formData.text}
-                      onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-                      placeholder={modalType === "note" ? "Write your note here..." : "Share your thought..."}
-                      required
-                    />
-                  </div>
-                  <div className="mb-5">
-                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Background Color</label>
-                    <input
-                      type="color"
-                      className="w-full h-[50px] p-1 rounded-[10px] border-none cursor-pointer outline-none transition-all duration-300 ease box-border"
-                      value={formData.color}
-                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                    />
-                  </div>
-                </>
-              )}
-              <div className="flex gap-3 mt-6">
-                <button type="button" className="flex-1 p-3 rounded-[10px] border border-[rgba(123,140,217,0.3)] bg-transparent text-[#7b8cd9] cursor-pointer font-semibold text-[15px] transition-all duration-300 ease hover:bg-[#f4f6ff] hover:border-[#7b8cd9]" onClick={closeModal}>
-                  Cancel
-                </button>
-                <button type="submit" className="flex-1 p-3 rounded-[10px] border-none bg-[linear-gradient(135deg,#7b8cd9_0%,#9eadeb_100%)] text-white cursor-pointer font-semibold text-[15px] shadow-[0_4px_16px_rgba(123,140,217,0.25)] transition-all duration-300 ease hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(123,140,217,0.35)]">
-                  Add to Wall
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
+        <Suspense fallback={null}>
+          <WallModal
+            modalType={modalType}
+            formData={formData}
+            setFormData={setFormData}
+            uploadedFile={uploadedFile}
+            handleFileUpload={handleFileUpload}
+            handleSubmit={handleSubmit}
+            closeModal={closeModal}
+          />
+        </Suspense>
       )}
     </div>
   );

@@ -1,4 +1,5 @@
 const bcrypt = require("bcryptjs");
+const mongoose = require("mongoose");
 const User = require("../models/User");
 
 const ping = (_req, res) => {
@@ -22,7 +23,7 @@ const signup = async (req, res, next) => {
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await User.create({ name: name.trim(), email: normalizedEmail, passwordHash });
 
-    res.status(201).json({ id: user._id, email: user.email, name: user.name });
+    res.status(201).json({ id: user._id.toString(), email: user.email, name: user.name });
   } catch (err) {
     next(err);
   }
@@ -30,14 +31,24 @@ const signup = async (req, res, next) => {
 
 const login = async (req, res, next) => {
   try {
-    const { email, password } = req.body || {};
+    const { email, identifier, password } = req.body || {};
+    const inputIdentifier = (identifier || email || "").trim();
 
-    if (!email || !password) {
-      return res.status(400).json({ message: "email and password are required" });
+    if (!inputIdentifier || !password) {
+      return res.status(400).json({ message: "Email/ID and password are required" });
     }
 
-    const normalizedEmail = email.trim().toLowerCase();
-    const user = await User.findOne({ email: normalizedEmail });
+    const normalized = inputIdentifier.toLowerCase();
+    const queryConditions = [
+      { email: normalized },
+      { name: inputIdentifier }
+    ];
+
+    if (mongoose.Types.ObjectId.isValid(inputIdentifier)) {
+      queryConditions.push({ _id: new mongoose.Types.ObjectId(inputIdentifier) });
+    }
+
+    const user = await User.findOne({ $or: queryConditions });
     if (!user) {
       return res.status(401).json({ message: "Invalid credentials" });
     }
@@ -47,7 +58,12 @@ const login = async (req, res, next) => {
       return res.status(401).json({ message: "Invalid credentials" });
     }
 
-    res.json({ message: "Login successful", id: user._id, email: user.email, name: user.name });
+    res.json({
+      message: "Login successful",
+      id: user._id.toString(),
+      email: user.email,
+      name: user.name,
+    });
   } catch (err) {
     next(err);
   }
@@ -58,3 +74,4 @@ module.exports = {
   signup,
   login,
 };
+

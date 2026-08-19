@@ -27,11 +27,16 @@ export default {
         float: {
           '0%, 100%': { transform: 'translateY(0) rotate(var(--rotation))' },
           '50%': { transform: 'translateY(-10px) rotate(var(--rotation))' },
-        }
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
       },
       animation: {
         fadeIn: 'fadeIn 1s ease-out 1.5s both',
         scaleIn: 'scaleIn 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) 0.5s both',
+        shimmer: 'shimmer 1.5s infinite linear',
       }
     },
   },

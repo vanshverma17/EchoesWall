@@ -1,7 +1,10 @@
-import React from "react";
+import React, { Suspense, lazy } from "react";
 import { useNavigate } from 'react-router-dom';
 import { fetchEchoes, deleteWallSnapshot } from "../services/echoesApi";
 import { getStoredUser } from "../services/authApi";
+import LazyImage from "../components/LazyImage";
+
+const DeleteConfirmModal = lazy(() => import("../components/DeleteConfirmModal"));
 
 const formatTimeAgo = (dateString) => {
   if (!dateString) return "Just now";
@@ -145,110 +148,110 @@ const Overview = () => {
             {/* Polaroid Photos (Row 1) */}
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "3%", left: "2.5%", transform: "rotate(-6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#5c6bc0" }}></div>
-              <img src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80" alt="Paris Eiffel Tower" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1502602898657-3e91760cbb34?w=400&q=80" alt="Paris Eiffel Tower" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "5%", left: "19%", transform: "rotate(5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ef5350" }}></div>
-              <img src="https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=400&q=80" alt="Eiffel Tower sunset" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1511739001486-6bfe10ce785f?w=400&q=80" alt="Eiffel Tower sunset" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "2.5%", left: "36%", transform: "rotate(-4deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ffa726" }}></div>
-              <img src="https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=400&q=80" alt="Cappadocia balloons" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1507608869274-d3177c8bb4c7?w=400&q=80" alt="Cappadocia balloons" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "6%", left: "53%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#e91e63" }}></div>
-              <img src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=80" alt="Santorini Greece" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1533105079780-92b9be482077?w=400&q=80" alt="Santorini Greece" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "3%", left: "69%", transform: "rotate(-5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#7b8cd9" }}></div>
-              <img src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" alt="Alpine mountains" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=400&q=80" alt="Alpine mountains" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "5%", right: "2.5%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#26a69a" }}></div>
-              <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80" alt="Lake boat" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=400&q=80" alt="Lake boat" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             {/* Polaroid Photos (Row 2) */}
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "27%", left: "3.5%", transform: "rotate(5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#66bb6a" }}></div>
-              <img src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?w=400&q=80" alt="Cute kitten" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1529778873920-4da4926a72c2?w=400&q=80" alt="Cute kitten" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "30%", left: "20%", transform: "rotate(-6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ab47bc" }}></div>
-              <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" alt="Delicious pizza" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=400&q=80" alt="Delicious pizza" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "26%", left: "37%", transform: "rotate(7deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#8d6e63" }}></div>
-              <img src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80" alt="Cat pet" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1574158622682-e40e69881006?w=400&q=80" alt="Cat pet" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "29%", left: "54%", transform: "rotate(-5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#26c6da" }}></div>
-              <img src="https://images.unsplash.com/photo-1542327897-d73f4005b533?w=400&q=80" alt="Cherry blossoms Japan" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1542327897-d73f4005b533?w=400&q=80" alt="Cherry blossoms Japan" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "27%", left: "70%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ff7043" }}></div>
-              <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" alt="Tropical beach" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=400&q=80" alt="Tropical beach" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "31%", right: "2.5%", transform: "rotate(-7deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#42a5f5" }}></div>
-              <img src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80" alt="Starry snowy mountain" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1519681393784-d120267933ba?w=400&q=80" alt="Starry snowy mountain" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             {/* Polaroid Photos (Row 3) */}
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "52%", left: "2.5%", transform: "rotate(-5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#29b6f6" }}></div>
-              <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80" alt="Yosemite valley" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&q=80" alt="Yosemite valley" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "55%", left: "19%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#5c6bc0" }}></div>
-              <img src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80" alt="Misty forest" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=400&q=80" alt="Misty forest" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "51%", left: "36%", transform: "rotate(-6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ffa726" }}></div>
-              <img src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80" alt="Coffee latte art" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&q=80" alt="Coffee latte art" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "54%", left: "53%", transform: "rotate(5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#66bb6a" }}></div>
-              <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80" alt="Road trip adventure" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=400&q=80" alt="Road trip adventure" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "51%", left: "69%", transform: "rotate(-6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ab47bc" }}></div>
-              <img src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80" alt="Italian pizza" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=400&q=80" alt="Italian pizza" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ top: "55%", right: "2.5%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#00acc1" }}></div>
-              <img src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80" alt="Lake landscape" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1501785888041-af3ef285b470?w=400&q=80" alt="Lake landscape" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             {/* Polaroid Photos (Row 4) */}
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ bottom: "3%", left: "2.5%", transform: "rotate(5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#ec407a" }}></div>
-              <img src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&q=80" alt="Sunlight forest" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1518495973542-4542c06a5843?w=400&q=80" alt="Sunlight forest" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ bottom: "3.5%", left: "36%", transform: "rotate(-5deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#7e57c2" }}></div>
-              <img src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400&q=80" alt="Hot air balloons" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1514539079130-25950c84af65?w=400&q=80" alt="Hot air balloons" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             <div className="absolute bg-white p-1 pb-4 sm:p-1.5 sm:pb-5 md:p-2 md:pb-6 shadow-[0_6px_20px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] rounded-[2px] cursor-pointer transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] hover:-translate-y-2 hover:!rotate-0 hover:scale-105 hover:z-50 hover:shadow-[0_16px_40px_rgba(0,0,0,0.18),0_4px_12px_rgba(0,0,0,0.12)] w-[75px] sm:w-[90px] md:w-[105px] lg:w-[120px]" style={{ bottom: "3%", left: "69%", transform: "rotate(6deg)" }}>
               <div className="absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3 rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.3),inset_0_1px_2px_rgba(255,255,255,0.5)] pointer-events-none z-10" style={{ background: "#26a69a" }}></div>
-              <img src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=400&q=80" alt="Venice Grand Canal" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] object-cover block rounded-[2px]" />
+              <LazyImage src="https://images.unsplash.com/photo-1527631746610-bca00a040d60?w=400&q=80" alt="Venice Grand Canal" className="w-full h-[55px] sm:h-[68px] md:h-[80px] lg:h-[95px] rounded-[2px]" />
             </div>
 
             {/* Sticky Notes (Row 4 slots) */}
@@ -373,24 +376,14 @@ const Overview = () => {
         </div>
       </div>
       {pendingDelete && (
-        <div className="fixed inset-0 bg-[rgba(0,0,0,0.35)] flex items-center justify-center z-[999] p-4">
-          <div className="bg-white rounded-[14px] p-5 max-w-[360px] w-full shadow-[0_12px_32px_rgba(0,0,0,0.18)] border border-[rgba(123,140,217,0.25)]">
-            <div className="text-[18px] font-bold text-[#1a202c] mb-2">Delete this wall?</div>
-            <div className="text-[14px] text-[#4a5568] mb-4 leading-[1.5]">
-              This will permanently remove "{pendingDelete.title}". You cannot undo this action.
-            </div>
-            <div className="flex justify-end gap-2.5">
-              <button className="p-[8px_14px] rounded-[10px] border border-[rgba(123,140,217,0.25)] bg-[#f7fafc] text-[#2d3748] cursor-pointer font-bold text-[13px] hover:-translate-y-0.5 hover:shadow-[0_8px_28px_rgba(123,140,217,0.35)]" onClick={() => setPendingDelete(null)}>Cancel</button>
-              <button
-                className={`p-[8px_14px] rounded-[10px] border border-[rgba(239,68,68,0.25)] bg-[#fef2f2] text-[#c53030] cursor-pointer font-bold text-[13px] hover:-translate-y-0.5 ${deletingId === pendingDelete.id ? 'opacity-70 cursor-not-allowed' : ''}`}
-                onClick={handleDeleteSnapshot}
-                disabled={deletingId === pendingDelete.id}
-              >
-                {deletingId === pendingDelete.id ? "Deleting..." : "Delete"}
-              </button>
-            </div>
-          </div>
-        </div>
+        <Suspense fallback={null}>
+          <DeleteConfirmModal
+            pendingDelete={pendingDelete}
+            deletingId={deletingId}
+            onCancel={() => setPendingDelete(null)}
+            onConfirm={handleDeleteSnapshot}
+          />
+        </Suspense>
       )}
     </div>
   );

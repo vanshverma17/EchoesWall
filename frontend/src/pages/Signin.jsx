@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { login, setStoredUser } from "../services/authApi";
+import LazyImage from "../components/LazyImage";
 
 const Signin = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -34,7 +35,8 @@ const Signin = () => {
     setStatus("");
     setLoading(true);
     try {
-      const user = await login({ email, password });
+      const trimmed = email.trim();
+      const user = await login({ email: trimmed, identifier: trimmed, password });
       setStoredUser(user);
       setStatus("Connected! Redirecting...");
       setTimeout(() => navigate("/overview"), 400);
@@ -52,7 +54,7 @@ const Signin = () => {
           <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-5 h-5 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)] z-[2]" style={{ background: photo.pinColor }}>
             <div className="absolute w-[2px] h-2 bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-4 -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
           </div>
-          <img src={photo.img} alt="" className="w-full h-[100px] md:h-[160px] object-cover block bg-[#f0f0f0]" />
+          <LazyImage src={photo.img} alt="" className="w-full h-[100px] md:h-[160px] rounded-[2px]" />
         </div>
       ))}
       
@@ -75,13 +77,13 @@ const Signin = () => {
         <form aria-label="Sign in form" onSubmit={handleSubmit}>
           <div className="flex flex-col mb-5">
             <label className="text-[13px] font-medium text-[#6b7280] mb-2 flex items-center gap-1.5" htmlFor="email">
-              <span className="text-[14px] opacity-60">✉</span> Email
+              <span className="text-[14px] opacity-60">✉</span> Email or User ID
             </label>
             <input 
               id="email" 
               name="email" 
-              type="email" 
-              placeholder="Enter your email" 
+              type="text" 
+              placeholder="Enter your email or User ID" 
               className="w-full h-11 p-[10px_12px] md:p-[12px_16px] rounded-lg border-[1.5px] border-[#dde3eb] outline-none text-[14px] text-[#3b3f4a] bg-white box-border transition-all duration-200 ease font-inherit focus:border-[#7b8cd9]"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

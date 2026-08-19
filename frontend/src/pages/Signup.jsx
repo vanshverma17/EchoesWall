@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { signup, setStoredUser } from "../services/authApi";
+import LazyImage from "../components/LazyImage";
 
 const Signup = () => {
   const [isLoaded, setIsLoaded] = useState(false);
@@ -35,7 +36,7 @@ const Signup = () => {
     setStatus("");
     setLoading(true);
     try {
-      const user = await signup({ name, email, password });
+      const user = await signup({ name: name.trim(), email: email.trim(), password });
       setStoredUser(user);
       setStatus("Account created! Redirecting to sign in...");
       setTimeout(() => navigate("/signin"), 500);
@@ -53,7 +54,7 @@ const Signup = () => {
           <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-5 h-5 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)] z-[2]" style={{ background: photo.pinColor }}>
             <div className="absolute w-[2px] h-2 bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-4 -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
           </div>
-          <img src={photo.img} alt="" className="w-full h-[100px] md:h-[160px] object-cover block bg-[#f0f0f0]" />
+          <LazyImage src={photo.img} alt="" className="w-full h-[100px] md:h-[160px] rounded-[2px]" />
         </div>
       ))}
       

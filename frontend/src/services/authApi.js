@@ -1,11 +1,17 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:4000";
+const API_BASE_URL = (import.meta.env.VITE_API_URL || "http://localhost:4000").replace(/\/+$/, "");
 
 const handleResponse = async (response) => {
-  const text = await response.text();
-  const data = text ? JSON.parse(text) : null;
+  let data = null;
+  let text = "";
+  try {
+    text = await response.text();
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
 
   if (!response.ok) {
-    const message = data?.message || "Request failed";
+    const message = data?.message || text || (response.statusText ? `${response.status} ${response.statusText}` : "Request failed");
     throw new Error(message);
   }
 
@@ -26,18 +32,22 @@ export const signup = async ({ name, email, password }) => {
   );
 };
 
-export const login = async ({ email, password }) => {
+export const login = async ({ email, identifier, password }) => {
+  const loginId = (identifier || email || "").trim();
   return handleResponse(
     await fetch(`${API_BASE_URL}/api/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ email: loginId, identifier: loginId, password }),
     })
   );
 };
 
 export const setStoredUser = (user) => {
   try {
+    if (user && !user.id && user._id) {
+      user.id = user._id;
+    }
     localStorage.setItem("echoesUser", JSON.stringify(user));
   } catch (err) {
     console.error("Failed to persist user", err);
@@ -47,7 +57,11 @@ export const setStoredUser = (user) => {
 export const getStoredUser = () => {
   try {
     const raw = localStorage.getItem("echoesUser");
-    return raw ? JSON.parse(raw) : null;
+    const user = raw ? JSON.parse(raw) : null;
+    if (user && !user.id && user._id) {
+      user.id = user._id;
+    }
+    return user;
   } catch (err) {
     console.error("Failed to read stored user", err);
     return null;
@@ -61,3 +75,4 @@ export const clearStoredUser = () => {
     console.error("Failed to clear stored user", err);
   }
 };
+
