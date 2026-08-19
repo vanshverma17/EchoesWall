@@ -61,10 +61,6 @@ const Landing = () => {
         <p className="text-[16px] md:text-[18px] text-[#8b94a8] mb-4 leading-relaxed">
           A quiet place to<br />pin moments that matter.
         </p>
-        <div className="text-[13px] text-[#4a5568] mb-5 font-semibold">
-          {status}
-          {userName ? ` • Hello, ${userName.split(" ")[0]}` : ""}
-        </div>
         <Link
           to="/signin"
           className="inline-block py-[14px] px-10 md:py-4 md:px-[60px] text-[15px] md:text-[16px] font-semibold rounded-full no-underline bg-[#7b8cd9] text-white shadow-[0_4px_12px_rgba(123,140,217,0.3)] transition-all duration-300 ease-in-out border-none cursor-pointer hover:bg-[#6a7bc5] hover:-translate-y-0.5 hover:scale-105 hover:shadow-[0_6px_20px_rgba(123,140,217,0.4)]"
