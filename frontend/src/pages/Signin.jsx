@@ -29,217 +29,6 @@ const Signin = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const styles = {
-    page: {
-      minHeight: "100vh",
-      minWidth: "100vw",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      background: "linear-gradient(135deg, #e8eef7 0%, #dfe7f2 50%, #f0f4f9 100%)",
-      padding: "40px",
-      boxSizing: "border-box",
-      fontFamily: "'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial",
-      color: "#3b3f4a",
-      position: "relative",
-      overflow: "hidden",
-    },
-    polaroid: (photo) => ({
-      position: "absolute",
-      top: photo.top,
-      left: photo.left,
-      right: photo.right,
-      bottom: photo.bottom,
-      width: "180px",
-      background: "#ffffff",
-      padding: "12px 12px 40px 12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.1)",
-      transform: `rotate(${photo.rotate}deg)`,
-      borderRadius: "4px",
-      zIndex: 1,
-    }),
-    polaroidImage: {
-      width: "100%",
-      height: "160px",
-      objectFit: "cover",
-      display: "block",
-      backgroundColor: "#f0f0f0",
-    },
-    polaroidPin: (color) => ({
-      position: "absolute",
-      top: "-8px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "20px",
-      height: "20px",
-      background: color,
-      borderRadius: "50%",
-      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2), inset -2px -2px 4px rgba(0, 0, 0, 0.1), inset 2px 2px 4px rgba(255, 255, 255, 0.4)",
-      zIndex: 2,
-    }),
-    polaroidPinNeedle: {
-      position: "absolute",
-      width: "2px",
-      height: "8px",
-      background: "linear-gradient(to bottom, #999, #666)",
-      left: "50%",
-      top: "16px",
-      transform: "translateX(-50%)",
-      boxShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
-    },
-    cardWrap: {
-      width: 400,
-      maxWidth: "90vw",
-      background: "#fafbfc",
-      borderRadius: 12,
-      padding: "48px 40px 40px 40px",
-      boxShadow: isHovered 
-        ? "-6px 8px 20px rgba(0, 0, 0, 0.15), -12px 16px 40px rgba(0, 0, 0, 0.1)"
-        : "-4px 6px 16px rgba(0, 0, 0, 0.12), -8px 12px 32px rgba(0, 0, 0, 0.08)",
-      position: "relative",
-      zIndex: 2,
-      opacity: isLoaded ? 1 : 0,
-      transform: isLoaded 
-        ? (isHovered ? "rotate(-1.5deg) translateY(-4px)" : "rotate(-1.5deg)")
-        : "rotate(-1.5deg) scale(0.95)",
-      transformOrigin: "center top",
-      transition: "all 0.3s ease-out, opacity 0.8s ease-out",
-      border: "1px solid rgba(220, 230, 245, 0.4)",
-    },
-    pin: {
-      position: "absolute",
-      top: "-16px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "28px",
-      height: "28px",
-      zIndex: 10,
-    },
-    pinHead: {
-      position: "absolute",
-      width: "28px",
-      height: "28px",
-      background: "radial-gradient(circle at 35% 35%, #b8d4f0, #8db8e8 50%, #6a9fd9 100%)",
-      borderRadius: "50%",
-      boxShadow: "0 2px 6px rgba(0, 0, 0, 0.2), inset -2px -2px 4px rgba(0, 0, 0, 0.1), inset 2px 2px 4px rgba(255, 255, 255, 0.5)",
-    },
-    pinNeedle: {
-      position: "absolute",
-      width: "2px",
-      height: "12px",
-      background: "linear-gradient(to bottom, #a5b8cc 0%, #7a8fa3 100%)",
-      left: "13px",
-      top: "24px",
-      boxShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
-      borderRadius: "0 0 1px 1px",
-    },
-    pinShadow: {
-      position: "absolute",
-      width: "24px",
-      height: "8px",
-      background: "radial-gradient(ellipse, rgba(0, 0, 0, 0.15) 0%, transparent 70%)",
-      left: "50%",
-      top: "8px",
-      transform: "translateX(-50%)",
-      borderRadius: "50%",
-      zIndex: 1,
-    },
-    heading: {
-      textAlign: "center",
-      marginBottom: 8,
-      marginTop: 0,
-      fontSize: 28,
-      fontWeight: 600,
-      color: "#4a505d",
-      letterSpacing: "-0.5px",
-    },
-    sub: {
-      textAlign: "center",
-      fontSize: 14,
-      color: "#9ba3b0",
-      marginBottom: 32,
-      fontWeight: 400,
-    },
-    field: {
-      display: "flex",
-      flexDirection: "column",
-      marginBottom: 20,
-    },
-    label: {
-      fontSize: 13,
-      fontWeight: 500,
-      color: "#6b7280",
-      marginBottom: 8,
-      display: "flex",
-      alignItems: "center",
-      gap: 6,
-    },
-    icon: {
-      fontSize: "14px",
-      opacity: 0.6,
-    },
-    input: {
-      width: "100%",
-      height: 44,
-      padding: "12px 16px",
-      borderRadius: 8,
-      border: "1.5px solid #dde3eb",
-      outline: "none",
-      fontSize: 14,
-      color: "#3b3f4a",
-      backgroundColor: "#ffffff",
-      boxSizing: "border-box",
-      transition: "all 0.2s ease",
-      fontFamily: "inherit",
-    },
-    forgotLink: {
-      fontSize: 12,
-      color: "#7b8cd9",
-      textDecoration: "none",
-      fontWeight: 500,
-      marginTop: 8,
-      display: "inline-block",
-      transition: "color 0.2s ease",
-    },
-    button: {
-      width: "100%",
-      height: 46,
-      background: "#7b8cd9",
-      color: "#fff",
-      border: "none",
-      borderRadius: 10,
-      fontSize: 15,
-      fontWeight: 600,
-      cursor: "pointer",
-      marginTop: 24,
-      letterSpacing: "0.2px",
-      transition: "all 0.2s ease",
-      boxShadow: "0 2px 8px rgba(123, 140, 217, 0.25)",
-      fontFamily: "inherit",
-    },
-    footer: {
-      marginTop: 24,
-      textAlign: "center",
-      fontSize: 13,
-      color: "#9ba3b0",
-    },
-    createLink: {
-      color: "#7b8cd9",
-      textDecoration: "none",
-      fontWeight: 500,
-      marginLeft: 4,
-    },
-    status: {
-      marginTop: 12,
-      fontSize: 13,
-      fontWeight: 600,
-      color: "#4a5568",
-    },
-    error: {
-      color: "#d14343",
-    },
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     setStatus("");
@@ -257,137 +46,82 @@ const Signin = () => {
   };
 
   return (
-    <>
-      <style>{`
-        input:focus {
-          border-color: #7b8cd9 !important;
-        }
-        button:hover {
-          background: #6a7bc5 !important;
-          transform: translateY(-1px);
-          box-shadow: 0 4px 12px rgba(123, 140, 217, 0.35) !important;
-        }
-        button:active {
-          transform: translateY(0);
-        }
-        a:hover {
-          color: #6a7bc5 !important;
-        }
+    <div className="min-h-screen min-w-[100vw] flex items-center justify-center bg-[linear-gradient(135deg,#e8eef7_0%,#dfe7f2_50%,#f0f4f9_100%)] p-5 md:p-10 box-border font-sans text-[#3b3f4a] relative overflow-hidden">
+      {polaroidPhotos.map((photo, index) => (
+        <div key={index} className="absolute w-[120px] md:w-[180px] bg-white p-[8px_8px_28px_8px] md:p-[12px_12px_40px_12px] shadow-[0_4px_12px_rgba(0,0,0,0.15),0_8px_24px_rgba(0,0,0,0.1)] rounded-[4px] z-[1]" style={{ top: photo.top, left: photo.left, right: photo.right, bottom: photo.bottom, transform: `rotate(${photo.rotate}deg)` }}>
+          <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-5 h-5 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.4)] z-[2]" style={{ background: photo.pinColor }}>
+            <div className="absolute w-[2px] h-2 bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-4 -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+          </div>
+          <img src={photo.img} alt="" className="w-full h-[100px] md:h-[160px] object-cover block bg-[#f0f0f0]" />
+        </div>
+      ))}
+      
+      <div
+        className={`w-[400px] max-w-[95vw] md:max-w-[90vw] bg-[#fafbfc] rounded-[12px] p-[36px_28px] md:p-[48px_40px_40px_40px] relative z-[2] transition-all duration-[800ms] ease-out border border-[rgba(220,230,245,0.4)] ${isLoaded ? 'opacity-100' : 'opacity-0 scale-95'} ${isHovered && isLoaded ? '-translate-y-1 shadow-[-6px_8px_20px_rgba(0,0,0,0.15),-12px_16px_40px_rgba(0,0,0,0.1)] rotate-[-1.5deg]' : 'shadow-[-4px_6px_16px_rgba(0,0,0,0.12),-8px_12px_32px_rgba(0,0,0,0.08)] rotate-[-1.5deg]'}`} 
+        aria-labelledby="signin-heading"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        style={{ transformOrigin: "center top" }}
+      >
+        <div className="absolute w-6 h-2 bg-[radial-gradient(ellipse,rgba(0,0,0,0.15)_0%,transparent_70%)] left-1/2 top-2 -translate-x-1/2 rounded-full z-[1]"></div>
+        <div className="absolute top-[-16px] left-1/2 -translate-x-1/2 w-7 h-7 z-10">
+          <div className="absolute w-7 h-7 bg-[radial-gradient(circle_at_35%_35%,#b8d4f0,#8db8e8_50%,#6a9fd9_100%)] rounded-full shadow-[0_2px_6px_rgba(0,0,0,0.2),inset_-2px_-2px_4px_rgba(0,0,0,0.1),inset_2px_2px_4px_rgba(255,255,255,0.5)]"></div>
+          <div className="absolute w-[2px] h-3 bg-[linear-gradient(to_bottom,#a5b8cc_0%,#7a8fa3_100%)] left-[13px] top-6 shadow-[1px_1px_2px_rgba(0,0,0,0.3)] rounded-[0_0_1px_1px]"></div>
+        </div>
         
-        @media (max-width: 768px) {
-          .signin-page {
-            padding: 20px !important;
-            overflow-x: hidden !important;
-          }
-          
-          .polaroid-signin {
-            width: 120px !important;
-            padding: 8px 8px 28px 8px !important;
-          }
-          
-          .polaroid-signin img {
-            height: 100px !important;
-          }
-          
-          .signin-card {
-            padding: 36px 28px !important;
-            max-width: 95vw !important;
-          }
-          
-          .signin-heading {
-            font-size: 28px !important;
-          }
-          
-          .signin-input {
-            font-size: 14px !important;
-            padding: 10px 12px !important;
-          }
-          
-          .signin-button {
-            padding: 12px !important;
-            font-size: 15px !important;
-          }
-        }
-      `}</style>
-      <div className="signin-page" style={styles.page}>
-        {polaroidPhotos.map((photo, index) => (
-          <div key={index} className="polaroid-signin" style={styles.polaroid(photo)}>
-            <div style={styles.polaroidPin(photo.pinColor)}>
-              <div style={styles.polaroidPinNeedle}></div>
-            </div>
-            <img src={photo.img} alt="" style={styles.polaroidImage} />
+        <h2 id="signin-heading" className="text-center mb-2 mt-0 text-[28px] md:text-[28px] font-semibold text-[#4a505d] tracking-[-0.5px]">Sign In</h2>
+        <div className="text-center text-[14px] text-[#9ba3b0] mb-8 font-normal">Enter your information below</div>
+
+        <form aria-label="Sign in form" onSubmit={handleSubmit}>
+          <div className="flex flex-col mb-5">
+            <label className="text-[13px] font-medium text-[#6b7280] mb-2 flex items-center gap-1.5" htmlFor="email">
+              <span className="text-[14px] opacity-60">✉</span> Email
+            </label>
+            <input 
+              id="email" 
+              name="email" 
+              type="email" 
+              placeholder="Enter your email" 
+              className="w-full h-11 p-[10px_12px] md:p-[12px_16px] rounded-lg border-[1.5px] border-[#dde3eb] outline-none text-[14px] text-[#3b3f4a] bg-white box-border transition-all duration-200 ease font-inherit focus:border-[#7b8cd9]"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </div>
-        ))}
-        
-        <div
-          className="signin-card" 
-          style={styles.cardWrap} 
-          aria-labelledby="signin-heading"
-          onMouseEnter={() => setIsHovered(true)}
-          onMouseLeave={() => setIsHovered(false)}
-        >
-          <div style={styles.pinShadow}></div>
-          <div style={styles.pin}>
-            <div style={styles.pinHead}></div>
-            <div style={styles.pinNeedle}></div>
+
+          <div className="flex flex-col mb-5">
+            <label className="text-[13px] font-medium text-[#6b7280] mb-2 flex items-center gap-1.5" htmlFor="password">
+              <span className="text-[14px] opacity-60">🔒</span> Password
+            </label>
+            <input 
+              id="password" 
+              name="password" 
+              type="password" 
+              placeholder="Enter your password" 
+              className="w-full h-11 p-[10px_12px] md:p-[12px_16px] rounded-lg border-[1.5px] border-[#dde3eb] outline-none text-[14px] text-[#3b3f4a] bg-white box-border transition-all duration-200 ease font-inherit focus:border-[#7b8cd9]"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+            <a href="#" className="text-[12px] text-[#7b8cd9] no-underline font-medium mt-2 inline-block transition-colors duration-200 ease hover:text-[#6a7bc5]">Forgot password?</a>
           </div>
-          
-          <h2 id="signin-heading" className="signin-heading" style={styles.heading}>Sign In</h2>
-          <div style={styles.sub}>Enter your information below</div>
 
-          <form aria-label="Sign in form" onSubmit={handleSubmit}>
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="email">
-                <span style={styles.icon}>✉</span> Email
-              </label>
-              <input 
-                id="email" 
-                name="email" 
-                type="email" 
-                placeholder="Enter your email" 
-                className="signin-input"
-                style={styles.input}
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+          <button type="submit" className="w-full h-[46px] bg-[#7b8cd9] text-white border-none rounded-[10px] text-[15px] font-semibold cursor-pointer mt-6 tracking-[0.2px] transition-all duration-200 ease shadow-[0_2px_8px_rgba(123,140,217,0.25)] font-inherit p-3 md:p-0 hover:bg-[#6a7bc5] hover:-translate-y-[1px] hover:shadow-[0_4px_12px_rgba(123,140,217,0.35)] active:translate-y-0" disabled={loading}>
+            {loading ? "Connecting..." : "Sign In"}
+          </button>
+          {status && (
+            <div className={`mt-3 text-[13px] font-semibold text-[#4a5568] ${(status.toLowerCase().includes("fail") || status.toLowerCase().includes("invalid") ? "text-[#d14343]" : "")}`}>
+              {status}
             </div>
+          )}
+        </form>
 
-            <div style={styles.field}>
-              <label style={styles.label} htmlFor="password">
-                <span style={styles.icon}>🔒</span> Password
-              </label>
-              <input 
-                id="password" 
-                name="password" 
-                type="password" 
-                placeholder="Enter your password" 
-                className="signin-input"
-                style={styles.input}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-              <a href="#" style={styles.forgotLink}>Forgot password?</a>
-            </div>
-
-            <button type="submit" className="signin-button" style={styles.button} disabled={loading}>
-              {loading ? "Connecting..." : "Sign In"}
-            </button>
-            {status && (
-              <div style={{ ...styles.status, ...(status.toLowerCase().includes("fail") || status.toLowerCase().includes("invalid") ? styles.error : {}) }}>
-                {status}
-              </div>
-            )}
-          </form>
-
-          <div style={styles.footer}>
-            New here?
-            <Link to="/signup" style={styles.createLink}>Create an account</Link>
-          </div>
+        <div className="mt-6 text-center text-[13px] text-[#9ba3b0]">
+          New here?
+          <Link to="/signup" className="text-[#7b8cd9] no-underline font-medium ml-1 hover:text-[#6a7bc5]">Create an account</Link>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 

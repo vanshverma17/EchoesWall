@@ -305,11 +305,9 @@ const Wall = ({ isNew = false }) => {
     const newLeft = Math.max(0, coords.x - canvasRect.left - dragOffset.x);
     const newTop = Math.max(0, coords.y - canvasRect.top - dragOffset.y);
 
-    // Apply position directly for smooth, crisp dragging
     el.style.left = `${newLeft}px`;
     el.style.top = `${newTop}px`;
     
-    // Store for mouseup
     draggingMetaRef.current = { ...draggingMetaRef.current, newLeft, newTop };
   };
 
@@ -341,1101 +339,309 @@ const Wall = ({ isNew = false }) => {
     }
   };
 
-  const styles = {
-    page: {
-      height: "100vh",
-      width: "100vw",
-      padding: "8px 16px",
-      boxSizing: "border-box",
-      fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-      background: "linear-gradient(to bottom right, #e8f6ff 0%, #f5fbff 50%, #ffffff 100%)",
-      display: "flex",
-      flexDirection: "column",
-      overflow: "hidden",
-    },
-    header: {
-      display: "flex",
-      justifyContent: "space-between",
-      alignItems: "center",
-      marginBottom: "0px",
-    },
-    title: {
-      fontSize: "32px",
-      fontWeight: 700,
-      fontFamily: "'Dancing Script', cursive",
-      background: "linear-gradient(135deg, #5a67d8 0%, #7b8cd9 100%)",
-      WebkitBackgroundClip: "text",
-      WebkitTextFillColor: "transparent",
-      backgroundClip: "text",
-    },
-    floatingPanel: {
-      position: "fixed",
-      right: "20px",
-      top: "50%",
-      transform: "translateY(-50%)",
-      display: "flex",
-      flexDirection: "column",
-      gap: "10px",
-      zIndex: 100,
-    },
-    noteBtn: {
-      padding: "10px",
-      borderRadius: "12px",
-      border: "1px solid #e0e0e0",
-      background: "#ffffff",
-      color: "#4a5568",
-      cursor: "pointer",
-      fontWeight: 500,
-      fontSize: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      transition: "all 0.2s ease",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "6px",
-      minWidth: "60px",
-    },
-    imageBtn: {
-      padding: "10px",
-      borderRadius: "12px",
-      border: "1px solid #e0e0e0",
-      background: "#ffffff",
-      color: "#4a5568",
-      cursor: "pointer",
-      fontWeight: 500,
-      fontSize: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      transition: "all 0.2s ease",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "6px",
-      minWidth: "60px",
-    },
-    thoughtBtn: {
-      padding: "10px",
-      borderRadius: "12px",
-      border: "1px solid #e0e0e0",
-      background: "#ffffff",
-      color: "#4a5568",
-      cursor: "pointer",
-      fontWeight: 500,
-      fontSize: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      transition: "all 0.2s ease",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "6px",
-      minWidth: "60px",
-    },
-    saveBtn: {
-      padding: "10px",
-      borderRadius: "12px",
-      border: "1px solid #66bb6a",
-      background: "#66bb6a",
-      color: "#ffffff",
-      cursor: "pointer",
-      fontWeight: 500,
-      fontSize: "12px",
-      boxShadow: "0 4px 12px rgba(102, 187, 106, 0.3)",
-      transition: "all 0.2s ease",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "6px",
-      minWidth: "60px",
-    },
-    clearBtn: {
-      padding: "10px",
-      borderRadius: "12px",
-      border: "1px solid #ef6b6b",
-      background: "#ffffff",
-      color: "#ef6b6b",
-      cursor: "pointer",
-      fontWeight: 500,
-      fontSize: "12px",
-      boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-      transition: "all 0.2s ease",
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-      gap: "6px",
-      minWidth: "60px",
-    },
-    savedIndicator: {
-      padding: "8px 16px",
-      borderRadius: "12px",
-      background: "rgba(102, 187, 106, 0.1)",
-      color: "#66bb6a",
-      fontSize: "12px",
-      fontWeight: 600,
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-    },
-    unsavedIndicator: {
-      padding: "8px 16px",
-      borderRadius: "12px",
-      background: "rgba(255, 152, 0, 0.1)",
-      color: "#ff9800",
-      fontSize: "12px",
-      fontWeight: 600,
-      display: "flex",
-      alignItems: "center",
-      gap: "6px",
-    },
-    statusRow: {
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      flexWrap: "wrap",
-    },
-    wallNameInput: {
-      minWidth: "220px",
-      padding: "10px 12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(123, 140, 217, 0.35)",
-      background: "rgba(255, 255, 255, 0.9)",
-      fontSize: "14px",
-      fontWeight: 600,
-      color: "#2d3748",
-      outline: "none",
-      boxShadow: "0 4px 12px rgba(123, 140, 217, 0.12)",
-    },
-    errorBanner: {
-      padding: "8px 12px",
-      borderRadius: "12px",
-      background: "rgba(239, 107, 107, 0.12)",
-      color: "#d14343",
-      fontSize: "12px",
-      fontWeight: 600,
-    },
-    canvasWrap: {
-      position: "relative",
-      flex: 1,
-      background: "linear-gradient(180deg, #f8fbff 0%, #eef3fb 100%)",
-      borderRadius: "16px",
-      overflow: "hidden",
-      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.08)",
-      border: "1px solid rgba(123, 140, 217, 0.12)",
-    },
-    canvas: {
-      position: "relative",
-      width: "100%",
-      height: "100%",
-      background: "transparent",
-      overflow: "hidden",
-    },
-    boardCamera: {
-      position: "fixed",
-      right: "18px",
-      bottom: "18px",
-      background: "linear-gradient(135deg, #ffffff 0%, #f4f6ff 100%)",
-      backdropFilter: "blur(12px)",
-      padding: "11px 16px",
-      borderRadius: "14px",
-      boxShadow: "0 10px 30px rgba(90, 103, 216, 0.18), 0 2px 8px rgba(0, 0, 0, 0.06)",
-      display: "flex",
-      alignItems: "center",
-      gap: "9px",
-      fontSize: "13px",
-      fontWeight: 700,
-      color: "#4752c4",
-      border: "1px solid rgba(90, 103, 216, 0.15)",
-      cursor: "pointer",
-      zIndex: 200,
-      transition: "all 0.2s ease",
-    },
-    boardCameraText: {
-      fontSize: "13px",
-      fontWeight: 700,
-      color: "#4752c4",
-    },
-    zoomControls: {
-      position: "fixed",
-      bottom: "20px",
-      left: "20px",
-      display: "flex",
-      gap: "8px",
-      background: "rgba(255, 255, 255, 0.95)",
-      backdropFilter: "blur(10px)",
-      padding: "8px",
-      borderRadius: "12px",
-      boxShadow: "0 4px 16px rgba(0, 0, 0, 0.1)",
-      zIndex: 200,
-    },
-    zoomBtn: {
-      width: "32px",
-      height: "32px",
-      borderRadius: "8px",
-      border: "1px solid rgba(123, 140, 217, 0.3)",
-      background: "#ffffff",
-      color: "#7b8cd9",
-      cursor: "pointer",
-      fontSize: "16px",
-      fontWeight: 600,
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      transition: "all 0.2s ease",
-    },
-    zoomLevel: {
-      padding: "0 8px",
-      fontSize: "13px",
-      fontWeight: 600,
-      color: "#4a5568",
-      display: "flex",
-      alignItems: "center",
-    },
-    canvasContent: {
-      transform: `scale(${zoom})`,
-      transformOrigin: "top left",
-      transition: "transform 0.2s ease",
-      width: "100%",
-      height: "100%",
-      position: "relative",
-    },
-    polaroid: {
-      position: "absolute",
-      background: "#ffffff",
-      padding: "12px 12px 36px 12px",
-      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.12), 0 4px 8px rgba(0, 0, 0, 0.08)",
-      borderRadius: "2px",
-      cursor: "move",
-      transition: "all 0.3s cubic-bezier(0.4, 0, 0.2, 1)",
-    },
-    pin: {
-      position: "absolute",
-      top: "-8px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      width: "16px",
-      height: "16px",
-      borderRadius: "50%",
-      boxShadow: "0 2px 4px rgba(0, 0, 0, 0.2), inset -2px -2px 3px rgba(0, 0, 0, 0.1), inset 2px 2px 3px rgba(255, 255, 255, 0.4)",
-      zIndex: 10,
-    },
-    pinNeedle: {
-      position: "absolute",
-      width: "2px",
-      height: "6px",
-      background: "linear-gradient(to bottom, #999, #666)",
-      left: "50%",
-      top: "14px",
-      transform: "translateX(-50%)",
-      boxShadow: "1px 1px 2px rgba(0, 0, 0, 0.3)",
-    },
-    polaroidImg: {
-      width: "160px",
-      height: "140px",
-      objectFit: "cover",
-      display: "block",
-      borderRadius: "2px",
-    },
-    deleteBtn: {
-      position: "absolute",
-      bottom: "8px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      padding: "4px 12px",
-      fontSize: "11px",
-      borderRadius: "6px",
-      border: "none",
-      background: "rgba(239, 107, 107, 0.9)",
-      color: "white",
-      cursor: "pointer",
-      fontWeight: 600,
-    },
-    stickyNote: {
-      position: "absolute",
-      padding: "14px 16px 40px 16px",
-      borderRadius: "2px",
-      boxShadow: "0 6px 18px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.06)",
-      fontSize: "13px",
-      lineHeight: "1.6",
-      fontFamily: "'Kalam', cursive",
-      cursor: "move",
-      transition: "all 0.3s ease",
-      width: "180px",
-      background: "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)",
-      border: "none",
-    },
-    stickyText: {
-      marginBottom: "10px",
-      fontWeight: 500,
-      wordWrap: "break-word",
-    },
-    cloud: {
-      position: "absolute",
-      padding: "16px 20px",
-      borderRadius: "50px",
-      boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
-      fontSize: "13px",
-      lineHeight: "1.5",
-      fontFamily: "'Inter', sans-serif",
-      cursor: "move",
-      transition: "all 0.3s ease",
-      maxWidth: "220px",
-      background: "#ffffff",
-      border: "2px solid rgba(0, 0, 0, 0.08)",
-    },
-    cloudText: {
-      marginBottom: "10px",
-      fontWeight: 500,
-      color: "#2d3748",
-      wordWrap: "break-word",
-    },
-    smallDeleteBtn: {
-      padding: "4px 10px",
-      fontSize: "11px",
-      borderRadius: "6px",
-      border: "none",
-      background: "rgba(239, 107, 107, 0.9)",
-      color: "white",
-      cursor: "pointer",
-      fontWeight: 600,
-    },
-    noteDeleteBtn: {
-      padding: "4px 10px",
-      fontSize: "11px",
-      borderRadius: "6px",
-      border: "none",
-      background: "rgba(239, 107, 107, 0.9)",
-      color: "white",
-      cursor: "pointer",
-      fontWeight: 600,
-      position: "absolute",
-      left: "50%",
-      transform: "translateX(-50%)",
-      bottom: "8px",
-    },
-    overlay: {
-      position: "fixed",
-      top: 0,
-      left: 0,
-      right: 0,
-      bottom: 0,
-      background: "rgba(0, 0, 0, 0.5)",
-      backdropFilter: "blur(4px)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 1000,
-    },
-    modal: {
-      background: "rgba(255, 255, 255, 0.95)",
-      backdropFilter: "blur(20px)",
-      borderRadius: "20px",
-      padding: "32px",
-      boxShadow: "0 20px 60px rgba(0, 0, 0, 0.3)",
-      minWidth: "400px",
-      maxWidth: "500px",
-    },
-    modalTitle: {
-      fontSize: "24px",
-      fontWeight: 700,
-      marginBottom: "24px",
-      color: "#2d3748",
-      fontFamily: "'Inter', sans-serif",
-    },
-    formGroup: {
-      marginBottom: "20px",
-    },
-    label: {
-      display: "block",
-      marginBottom: "8px",
-      fontSize: "14px",
-      fontWeight: 600,
-      color: "#4a5568",
-    },
-    input: {
-      width: "100%",
-      padding: "12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(123, 140, 217, 0.2)",
-      fontSize: "14px",
-      fontFamily: "inherit",
-      outline: "none",
-      background: "rgba(255, 255, 255, 0.8)",
-      color: "#2d3748",
-      transition: "all 0.3s ease",
-      boxSizing: "border-box",
-    },
-    colorPicker: {
-      width: "100%",
-      height: "50px",
-      padding: "4px",
-      borderRadius: "10px",
-      border: "none",
-      cursor: "pointer",
-      outline: "none",
-      transition: "all 0.3s ease",
-      boxSizing: "border-box",
-    },
-    textarea: {
-      width: "100%",
-      padding: "12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(123, 140, 217, 0.2)",
-      fontSize: "14px",
-      fontFamily: "inherit",
-      resize: "vertical",
-      minHeight: "100px",
-      outline: "none",
-      background: "rgba(255, 255, 255, 0.8)",
-      color: "#2d3748",
-      transition: "all 0.3s ease",
-      boxSizing: "border-box",
-    },
-    modalButtons: {
-      display: "flex",
-      gap: "12px",
-      marginTop: "24px",
-    },
-    submitBtn: {
-      flex: 1,
-      padding: "12px",
-      borderRadius: "10px",
-      border: "none",
-      background: "linear-gradient(135deg, #7b8cd9 0%, #9eadeb 100%)",
-      color: "white",
-      cursor: "pointer",
-      fontWeight: 600,
-      fontSize: "15px",
-      boxShadow: "0 4px 16px rgba(123, 140, 217, 0.25)",
-      transition: "all 0.3s ease",
-    },
-    cancelBtn: {
-      flex: 1,
-      padding: "12px",
-      borderRadius: "10px",
-      border: "1px solid rgba(123, 140, 217, 0.3)",
-      background: "transparent",
-      color: "#7b8cd9",
-      cursor: "pointer",
-      fontWeight: 600,
-      fontSize: "15px",
-      transition: "all 0.3s ease",
-    },
-    uploadButton: {
-      width: "100%",
-      padding: "12px",
-      borderRadius: "10px",
-      border: "2px dashed rgba(123, 140, 217, 0.3)",
-      background: "rgba(123, 140, 217, 0.05)",
-      color: "#7b8cd9",
-      cursor: "pointer",
-      fontWeight: 600,
-      fontSize: "14px",
-      transition: "all 0.3s ease",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      gap: "8px",
-    },
-    filePreview: {
-      marginTop: "12px",
-      padding: "12px",
-      borderRadius: "10px",
-      background: "rgba(102, 187, 106, 0.1)",
-      color: "#66bb6a",
-      fontSize: "13px",
-      fontWeight: 600,
-      display: "flex",
-      alignItems: "center",
-      gap: "8px",
-    },
-    divider: {
-      display: "flex",
-      alignItems: "center",
-      gap: "12px",
-      margin: "16px 0",
-      color: "#a0aec0",
-      fontSize: "13px",
-      fontWeight: 500,
-    },
-    dividerLine: {
-      flex: 1,
-      height: "1px",
-      background: "rgba(123, 140, 217, 0.2)",
-    },
-  };
-
   return (
-    <>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Kalam:wght@400&family=Inter:wght@400;500;600;700&display=swap');
-        
-        .note-btn:hover,
-        .image-btn:hover,
-        .thought-btn:hover {
-          border-color: #7b8cd9 !important;
-          background: #f8f9ff !important;
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15) !important;
-          transform: translateX(-4px) scale(1.05) !important;
-        }
-        
-        .save-btn:hover {
-          background: #57a85b !important;
-          box-shadow: 0 6px 16px rgba(102, 187, 106, 0.4) !important;
-          transform: translateX(-4px) scale(1.05) !important;
-        }
-        
-        .clear-btn:hover {
-          border-color: #ef6b6b !important;
-          background: #fff5f5 !important;
-          box-shadow: 0 6px 16px rgba(239, 107, 107, 0.3) !important;
-          transform: translateX(-4px) scale(1.05) !important;
-        }
-        
-        button:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 28px rgba(123, 140, 217, 0.35) !important;
-        }
-        
-        .polaroid:hover {
-          transform: translateY(-4px) rotate(0deg) !important;
-          z-index: 100;
-          box-shadow: 0 16px 40px rgba(0, 0, 0, 0.18) !important;
-        }
-        
-        .sticky-note:hover {
-          transform: translateY(-4px) rotate(0deg) !important;
-          z-index: 50;
-        }
-        
-        .cloud:hover {
-          transform: scale(1.05) !important;
-          z-index: 50;
-        }
-
-        .board-camera:hover:not([disabled]) {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(123, 140, 217, 0.3) !important;
-        }
-
-        .board-camera[disabled] {
-          opacity: 0.6;
-          cursor: not-allowed;
-          box-shadow: none !important;
-          transform: none !important;
-        }
-
-        .item-delete-btn {
-          opacity: 0;
-          pointer-events: none;
-          transition: opacity 0.2s ease;
-        }
-
-        .sticky-note:hover .item-delete-btn,
-        .cloud:hover .item-delete-btn,
-        .polaroid:hover .item-delete-btn {
-          opacity: 1;
-          pointer-events: auto;
-        }
-        
-        input:focus, textarea:focus {
-          border-color: rgba(123, 140, 217, 0.5) !important;
-          box-shadow: 0 0 0 3px rgba(123, 140, 217, 0.1) !important;
-        }
-        
-        .zoom-btn:hover {
-          background: #7b8cd9 !important;
-          color: #ffffff !important;
-          transform: scale(1.1);
-        }
-        
-        .zoom-controls,
-        .board-camera {
-          pointer-events: auto;
-          user-select: none;
-        }
-        
-        @media (max-width: 768px) {
-          .wall-page {
-            padding: 4px !important;
-            overflow-x: hidden !important;
-            height: 100vh !important;
-          }
-          
-          .wall-header {
-            margin-bottom: 4px !important;
-            padding: 8px !important;
-          }
-          
-          .wall-title {
-            font-size: 20px !important;
-          }
-          
-          .wall-name-input {
-            font-size: 12px !important;
-            padding: 8px 10px !important;
-            min-width: 140px !important;
-          }
-          
-          .status-row {
-            flex-wrap: wrap !important;
-            gap: 6px !important;
-          }
-          
-          .floating-panel {
-            position: fixed !important;
-            right: 4px !important;
-            top: 50% !important;
-            transform: translateY(-50%) !important;
-            gap: 4px !important;
-            z-index: 200 !important;
-          }
-          
-          .note-btn,
-          .image-btn,
-          .thought-btn,
-          .clear-btn,
-          .save-btn {
-            min-width: 44px !important;
-            min-height: 44px !important;
-            padding: 6px !important;
-            font-size: 9px !important;
-            gap: 2px !important;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15) !important;
-          }
-          
-          .note-btn svg,
-          .image-btn svg,
-          .thought-btn svg,
-          .clear-btn svg,
-          .save-btn svg {
-            width: 16px !important;
-            height: 16px !important;
-          }
-          
-          .canvas-wrap {
-            height: calc(100vh - 100px) !important;
-            border-radius: 12px !important;
-            margin: 4px !important;
-          }
-          
-          .canvas-area {
-            padding: 8px !important;
-            touch-action: none !important;
-          }
-          
-          .sticky-note {
-            padding: 10px 12px 32px 12px !important;
-            font-size: 12px !important;
-            min-width: 140px !important;
-            width: 140px !important;
-            touch-action: none !important;
-          }
-          
-          .cloud {
-            padding: 12px 16px !important;
-            font-size: 12px !important;
-            max-width: 160px !important;
-            touch-action: none !important;
-          }
-          
-          .polaroid {
-            padding: 10px 10px 32px 10px !important;
-            touch-action: none !important;
-          }
-          
-          .polaroid img {
-            width: 120px !important;
-            height: 110px !important;
-          }
-          
-          .zoom-controls {
-            bottom: 70px !important;
-            left: 8px !important;
-            gap: 4px !important;
-            padding: 6px !important;
-            position: fixed !important;
-          }
-          
-          .zoom-btn {
-            width: 36px !important;
-            height: 36px !important;
-            font-size: 18px !important;
-            min-width: 36px !important;
-          }
-          
-          .zoom-level {
-            font-size: 11px !important;
-            padding: 0 6px !important;
-          }
-          
-          .board-camera {
-            bottom: 8px !important;
-            right: 8px !important;
-            left: 8px !important;
-            padding: 10px 12px !important;
-            font-size: 11px !important;
-            justify-content: center !important;
-            position: fixed !important;
-          }
-          
-          .board-camera-text {
-            font-size: 11px !important;
-          }
-          
-          .board-camera svg {
-            width: 16px !important;
-            height: 16px !important;
-          }
-          
-          .modal-content {
-            padding: 20px !important;
-            min-width: 90vw !important;
-            max-width: 90vw !important;
-            margin: 16px !important;
-            border-radius: 16px !important;
-          }
-          
-          .modal-title {
-            font-size: 20px !important;
-            margin-bottom: 16px !important;
-          }
-          
-          .item-delete-btn {
-            opacity: 1 !important;
-            pointer-events: auto !important;
-          }
-          
-          .saved-indicator,
-          .unsaved-indicator {
-            font-size: 10px !important;
-            padding: 6px 10px !important;
-          }
-          
-          .error-banner {
-            font-size: 11px !important;
-            padding: 6px 10px !important;
-          }
-        }
-        
-        @media (max-width: 480px) {
-          .wall-title {
-            font-size: 18px !important;
-          }
-          
-          .status-row {
-            font-size: 11px !important;
-          }
-          
-          .floating-panel {
-            right: 2px !important;
-          }
-          
-          .canvas-wrap {
-            height: calc(100vh - 90px) !important;
-          }
-          
-          .sticky-note {
-            width: 120px !important;
-            min-width: 120px !important;
-            font-size: 11px !important;
-          }
-          
-          .cloud {
-            max-width: 140px !important;
-            font-size: 11px !important;
-          }
-          
-          .polaroid img {
-            width: 100px !important;
-            height: 90px !important;
-          }
-        }
-      `}</style>
-      
-      <div className="wall-page" style={styles.page}>
-        {/* Floating Action Buttons */}
-        <div className="floating-panel" style={styles.floatingPanel}>
-          <button className="save-btn" style={styles.saveBtn} onClick={saveWall} title="Save Wall">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
-              <polyline points="17 21 17 13 7 13 7 21"/>
-              <polyline points="7 3 7 8 15 8"/>
-            </svg>
-            <span>Save</span>
-          </button>
-          <button className="note-btn" style={styles.noteBtn} onClick={() => openModal("note")} title="Add Note">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-              <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-            </svg>
-            <span>Note</span>
-          </button>
-          <button className="image-btn" style={styles.imageBtn} onClick={() => openModal("image")} title="Add Image">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <circle cx="8.5" cy="8.5" r="1.5"/>
-              <polyline points="21 15 16 10 5 21"/>
-            </svg>
-            <span>Image</span>
-          </button>
-          <button className="thought-btn" style={styles.thoughtBtn} onClick={() => openModal("thought")} title="Add Thought">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-            </svg>
-            <span>Thought</span>
-          </button>
-          <button className="clear-btn" style={styles.clearBtn} onClick={clearAll} title="Clear All">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <polyline points="3 6 5 6 21 6"/>
-              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-            </svg>
-            <span>Clear</span>
-          </button>
-        </div>
-
-        <div className="wall-header" style={styles.header}>
-          <div className="status-row" style={styles.statusRow}>
-            <h2 className="wall-title" style={styles.title}>Create Your Wall</h2>
-            <input
-              className="wall-name-input"
-              style={styles.wallNameInput}
-              value={wallTitle}
-              onChange={(e) => setWallTitle(e.target.value)}
-              placeholder="Name your wall"
-            />
-            {saving ? (
-              <div style={styles.unsavedIndicator}>
-                <span>●</span>
-                Saving...
-              </div>
-            ) : saved ? (
-              <div style={styles.savedIndicator}>
-                <span>✓</span>
-                Saved
-              </div>
-            ) : (
-              <div style={styles.unsavedIndicator}>
-                <span>●</span>
-                Unsaved changes
-              </div>
-            )}
-            {loading && (
-              <div style={styles.unsavedIndicator}>
-                <span>●</span>
-                Loading...
-              </div>
-            )}
-          </div>
-          {error && <div style={styles.errorBanner}>{error}</div>}
-        </div>
-
-        <div className="canvas-wrap" style={styles.canvasWrap}>
-          <div
-            ref={canvasRef}
-            className="canvas-area"
-            style={styles.canvas}
-            onMouseMove={handleMouseMove}
-            onMouseUp={handleMouseUp}
-            onMouseLeave={handleMouseUp}
-            onTouchMove={handleMouseMove}
-            onTouchEnd={handleMouseUp}
-          >
-            <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
-              {loading ? (
-                <div style={styles.loadingState}>Loading your wall...</div>
-              ) : (
-                items.map((it) => {
-                if (it.type === "note") {
-                  return (
-                    <div 
-                      key={it.id} 
-                      className="sticky-note" 
-                      style={{...styles.stickyNote, background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
-                      onMouseDown={(e) => handleMouseDown(e, it.id)}
-                      onTouchStart={(e) => handleMouseDown(e, it.id)}
-                    >
-                      <div style={{...styles.pin, background: getRandomPinColor()}}>
-                        <div style={styles.pinNeedle}></div>
-                      </div>
-                      <div style={styles.stickyText}>{it.text}</div>
-                      <button className="item-delete-btn" style={styles.noteDeleteBtn} onClick={() => removeItem(it.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  );
-                }
-
-                if (it.type === "thought") {
-                  return (
-                    <div 
-                      key={it.id} 
-                      className="cloud" 
-                      style={{...styles.cloud, background: it.color || "#ffffff", top: it.top, left: it.left}} 
-                      onMouseDown={(e) => handleMouseDown(e, it.id)}
-                      onTouchStart={(e) => handleMouseDown(e, it.id)}
-                    >
-                      <div style={{...styles.pin, background: getRandomPinColor()}}>
-                        <div style={styles.pinNeedle}></div>
-                      </div>
-                      <div style={styles.cloudText}>{it.text}</div>
-                      <button className="item-delete-btn" style={styles.smallDeleteBtn} onClick={() => removeItem(it.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  );
-                }
-
-                if (it.type === "image") {
-                  return (
-                    <div 
-                      key={it.id} 
-                      className="polaroid" 
-                      style={{...styles.polaroid, top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
-                      onMouseDown={(e) => handleMouseDown(e, it.id)}
-                      onTouchStart={(e) => handleMouseDown(e, it.id)}
-                    >
-                      <div style={{...styles.pin, background: getRandomPinColor()}}>
-                        <div style={styles.pinNeedle}></div>
-                      </div>
-                      <img src={it.src} alt="memory" style={styles.polaroidImg} />
-                      <button className="item-delete-btn" style={styles.deleteBtn} onClick={() => removeItem(it.id)}>
-                        Delete
-                      </button>
-                    </div>
-                  );
-                }
-
-                return null;
-              })
-              )}
-            </div>
-          </div>
-          
-          {/* Zoom Controls - Fixed Position */}
-          <div className="zoom-controls" style={styles.zoomControls} data-html2canvas-ignore="true">
-            <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomOut} title="Zoom Out">
-              −
-            </button>
-            <div style={styles.zoomLevel}>{Math.round(zoom * 100)}%</div>
-            <button className="zoom-btn" style={styles.zoomBtn} onClick={resetZoom} title="Reset Zoom">
-              ⟲
-            </button>
-            <button className="zoom-btn" style={styles.zoomBtn} onClick={zoomIn} title="Zoom In">
-              +
-            </button>
-          </div>
-
-          <button
-            className="board-camera"
-            style={styles.boardCamera}
-            onClick={downloadBoardImage}
-            disabled={exporting}
-            data-html2canvas-ignore="true"
-            title="Save board to your device"
-          >
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-              <circle cx="12" cy="13" r="4"></circle>
-            </svg>
-            <span style={styles.boardCameraText}>{exporting ? "Saving..." : "Board Camera"}</span>
-          </button>
-        </div>
-
-        {/* Modal Overlay */}
-        {showModal && (
-          <div style={styles.overlay} onClick={closeModal}>
-            <div className="modal-content" style={styles.modal} onClick={(e) => e.stopPropagation()}>
-              <h3 className="modal-title" style={styles.modalTitle}>
-                {modalType === "note" && "Add a New Note"}
-                {modalType === "image" && "Add a New Image"}
-                {modalType === "thought" && "Add a New Thought"}
-              </h3>
-              <form onSubmit={handleSubmit}>
-                {modalType === "image" ? (
-                  <>
-                    <div style={styles.formGroup}>
-                      <label style={styles.label}>Upload Image</label>
-                      <label htmlFor="file-upload" style={styles.uploadButton}>
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                          <polyline points="17 8 12 3 7 8"/>
-                          <line x1="12" y1="3" x2="12" y2="15"/>
-                        </svg>
-                        Choose Image from Device
-                      </label>
-                      <input
-                        id="file-upload"
-                        type="file"
-                        accept="image/*"
-                        style={{display: "none"}}
-                        onChange={handleFileUpload}
-                      />
-                      {uploadedFile && (
-                        <div style={styles.filePreview}>
-                          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                            <polyline points="20 6 9 17 4 12"/>
-                          </svg>
-                          {uploadedFile.name}
-                        </div>
-                      )}
-                    </div>
-                    <div style={styles.divider}>
-                      <div style={styles.dividerLine}></div>
-                      <span>OR</span>
-                      <div style={styles.dividerLine}></div>
-                    </div>
-                    <div style={styles.formGroup}>
-                      <label style={styles.label}>Image URL</label>
-                      <input
-                        type="url"
-                        style={styles.input}
-                        value={formData.url}
-                        onChange={(e) => {
-                          setFormData({ ...formData, url: e.target.value });
-                          setUploadedFile(null);
-                        }}
-                        placeholder="https://example.com/image.jpg"
-                        disabled={!!uploadedFile}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <>
-                    <div style={styles.formGroup}>
-                      <label style={styles.label}>
-                        {modalType === "note" ? "Note Content" : "Thought Content"}
-                      </label>
-                      <textarea
-                        style={styles.textarea}
-                        value={formData.text}
-                        onChange={(e) => setFormData({ ...formData, text: e.target.value })}
-                        placeholder={modalType === "note" ? "Write your note here..." : "Share your thought..."}
-                        required
-                      />
-                    </div>
-                    <div style={styles.formGroup}>
-                      <label style={styles.label}>Background Color</label>
-                      <input
-                        type="color"
-                        style={styles.colorPicker}
-                        value={formData.color}
-                        onChange={(e) => setFormData({ ...formData, color: e.target.value })}
-                      />
-                    </div>
-                  </>
-                )}
-                <div style={styles.modalButtons}>
-                  <button type="button" style={styles.cancelBtn} onClick={closeModal}>
-                    Cancel
-                  </button>
-                  <button type="submit" style={styles.submitBtn}>
-                    Add to Wall
-                  </button>
-                </div>
-              </form>
-            </div>
-          </div>
-        )}
+    <div className="h-screen w-screen p-1 md:p-2 lg:p-4 box-border font-sans bg-[linear-gradient(to_bottom_right,#e8f6ff_0%,#f5fbff_50%,#ffffff_100%)] flex flex-col overflow-hidden">
+      {/* Floating Action Buttons */}
+      <div className="fixed right-1 md:right-5 top-1/2 -translate-y-1/2 flex flex-col gap-1 md:gap-2.5 z-[100] md:z-[100] z-[200]">
+        <button 
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#66bb6a] bg-[#66bb6a] text-white cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(102,187,106,0.3)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:bg-[#57a85b] hover:shadow-[0_6px_16px_rgba(102,187,106,0.4)] hover:-translate-x-1 hover:scale-105" 
+          onClick={saveWall} 
+          title="Save Wall"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+            <polyline points="17 21 17 13 7 13 7 21"/>
+            <polyline points="7 3 7 8 15 8"/>
+          </svg>
+          <span>Save</span>
+        </button>
+        <button 
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
+          onClick={() => openModal("note")} 
+          title="Add Note"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+          </svg>
+          <span>Note</span>
+        </button>
+        <button 
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
+          onClick={() => openModal("image")} 
+          title="Add Image"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            <circle cx="8.5" cy="8.5" r="1.5"/>
+            <polyline points="21 15 16 10 5 21"/>
+          </svg>
+          <span>Image</span>
+        </button>
+        <button 
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#e0e0e0] bg-white text-[#4a5568] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#7b8cd9] hover:bg-[#f8f9ff] hover:shadow-[0_6px_16px_rgba(0,0,0,0.15)] hover:-translate-x-1 hover:scale-105" 
+          onClick={() => openModal("thought")} 
+          title="Add Thought"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
+          <span>Thought</span>
+        </button>
+        <button 
+          className="p-1.5 md:p-2.5 rounded-[12px] border border-[#ef6b6b] bg-white text-[#ef6b6b] cursor-pointer font-medium text-[9px] md:text-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.1)] transition-all duration-200 ease flex flex-col items-center gap-0.5 md:gap-1.5 min-w-[44px] min-h-[44px] md:min-w-[60px] md:min-h-0 hover:border-[#ef6b6b] hover:bg-[#fff5f5] hover:shadow-[0_6px_16px_rgba(239,107,107,0.3)] hover:-translate-x-1 hover:scale-105" 
+          onClick={clearAll} 
+          title="Clear All"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+          </svg>
+          <span>Clear</span>
+        </button>
       </div>
-    </>
+
+      <div className="flex justify-between items-center mb-1 md:mb-0 p-2 md:p-0">
+        <div className="flex items-center gap-1.5 md:gap-3 flex-wrap md:flex-nowrap">
+          <h2 className="text-[20px] md:text-[32px] font-bold font-dancing bg-[linear-gradient(135deg,#5a67d8_0%,#7b8cd9_100%)] bg-clip-text text-transparent">Create Your Wall</h2>
+          <input
+            className="min-w-[140px] md:min-w-[220px] p-[8px_10px] md:p-[10px_12px] rounded-[10px] border border-[rgba(123,140,217,0.35)] bg-white/90 text-[12px] md:text-[14px] font-semibold text-[#2d3748] outline-none shadow-[0_4px_12px_rgba(123,140,217,0.12)] focus:border-[rgba(123,140,217,0.5)] focus:shadow-[0_0_0_3px_rgba(123,140,217,0.1)] transition-all"
+            value={wallTitle}
+            onChange={(e) => setWallTitle(e.target.value)}
+            placeholder="Name your wall"
+          />
+          {saving ? (
+            <div className="p-[6px_10px] md:p-[8px_16px] rounded-[12px] bg-[rgba(255,152,0,0.1)] text-[#ff9800] text-[10px] md:text-[12px] font-semibold flex items-center gap-1.5">
+              <span>●</span>
+              Saving...
+            </div>
+          ) : saved ? (
+            <div className="p-[6px_10px] md:p-[8px_16px] rounded-[12px] bg-[rgba(102,187,106,0.1)] text-[#66bb6a] text-[10px] md:text-[12px] font-semibold flex items-center gap-1.5">
+              <span>✓</span>
+              Saved
+            </div>
+          ) : (
+            <div className="p-[6px_10px] md:p-[8px_16px] rounded-[12px] bg-[rgba(255,152,0,0.1)] text-[#ff9800] text-[10px] md:text-[12px] font-semibold flex items-center gap-1.5">
+              <span>●</span>
+              Unsaved changes
+            </div>
+          )}
+          {loading && (
+            <div className="p-[6px_10px] md:p-[8px_16px] rounded-[12px] bg-[rgba(255,152,0,0.1)] text-[#ff9800] text-[10px] md:text-[12px] font-semibold flex items-center gap-1.5">
+              <span>●</span>
+              Loading...
+            </div>
+          )}
+        </div>
+        {error && <div className="p-[6px_10px] md:p-[8px_12px] rounded-[12px] bg-[rgba(239,107,107,0.12)] text-[#d14343] text-[11px] md:text-[12px] font-semibold">{error}</div>}
+      </div>
+
+      <div className="relative flex-1 bg-[#f4f7fc] bg-[linear-gradient(rgba(123,140,217,0.25)_1px,transparent_1px),linear-gradient(90deg,rgba(123,140,217,0.25)_1px,transparent_1px)] bg-[size:24px_24px] rounded-[12px] md:rounded-[16px] overflow-hidden shadow-[0_8px_24px_rgba(0,0,0,0.08)] border border-[rgba(123,140,217,0.15)] m-1 md:m-0 h-[calc(100vh-100px)] md:h-auto">
+        <div
+          ref={canvasRef}
+          className="canvas-area relative w-full h-full bg-transparent overflow-hidden p-2 md:p-0 touch-none md:touch-auto"
+          onMouseMove={handleMouseMove}
+          onMouseUp={handleMouseUp}
+          onMouseLeave={handleMouseUp}
+          onTouchMove={handleMouseMove}
+          onTouchEnd={handleMouseUp}
+        >
+          <div style={{transform: `scale(${zoom})`, transformOrigin: "top left", transition: "transform 0.2s ease", width: "100%", height: "100%", position: "relative"}}>
+            {loading ? (
+              <div className="p-4 text-[#4a5568] font-semibold">Loading your wall...</div>
+            ) : (
+              items.map((it) => {
+              if (it.type === "note") {
+                return (
+                  <div 
+                    key={it.id} 
+                    className="group absolute p-[10px_12px_32px_12px] md:p-[14px_16px_40px_16px] rounded-[2px] shadow-[0_6px_18px_rgba(0,0,0,0.1),0_2px_6px_rgba(0,0,0,0.06)] text-[11px] md:text-[13px] leading-[1.6] font-kalam cursor-move transition-all duration-300 ease-in w-[120px] md:w-[180px] min-w-[120px] md:min-w-0 border-none touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-50" 
+                    style={{background: it.color || "linear-gradient(135deg, #fff9c4 0%, #ffeb8f 100%)", top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
+                    onMouseDown={(e) => handleMouseDown(e, it.id)}
+                    onTouchStart={(e) => handleMouseDown(e, it.id)}
+                  >
+                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
+                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                    </div>
+                    <div className="mb-2.5 font-medium break-words">{it.text}</div>
+                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute left-1/2 -translate-x-1/2 bottom-2 p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                      Delete
+                    </button>
+                  </div>
+                );
+              }
+
+              if (it.type === "thought") {
+                return (
+                  <div 
+                    key={it.id} 
+                    className="group absolute p-[12px_16px] md:p-[16px_20px] rounded-[50px] shadow-[0_6px_20px_rgba(0,0,0,0.08)] text-[11px] md:text-[13px] leading-[1.5] font-sans cursor-move transition-all duration-300 ease max-w-[140px] md:max-w-[220px] border-[2px] border-[rgba(0,0,0,0.08)] touch-none md:touch-auto hover:scale-105 hover:z-50" 
+                    style={{background: it.color || "#ffffff", top: it.top, left: it.left}} 
+                    onMouseDown={(e) => handleMouseDown(e, it.id)}
+                    onTouchStart={(e) => handleMouseDown(e, it.id)}
+                  >
+                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
+                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                    </div>
+                    <div className="mb-2.5 font-medium text-[#2d3748] break-words">{it.text}</div>
+                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease p-[4px_10px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                      Delete
+                    </button>
+                  </div>
+                );
+              }
+
+              if (it.type === "image") {
+                return (
+                  <div 
+                    key={it.id} 
+                    className="group absolute bg-white p-[10px_10px_32px_10px] md:p-[12px_12px_36px_12px] shadow-[0_8px_24px_rgba(0,0,0,0.12),0_4px_8px_rgba(0,0,0,0.08)] rounded-[2px] cursor-move transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)] touch-none md:touch-auto hover:-translate-y-1 hover:!rotate-0 hover:z-[100] hover:shadow-[0_16px_40px_rgba(0,0,0,0.18)]" 
+                    style={{top: it.top, left: it.left, transform: `rotate(${Math.random() * 10 - 5}deg)`}} 
+                    onMouseDown={(e) => handleMouseDown(e, it.id)}
+                    onTouchStart={(e) => handleMouseDown(e, it.id)}
+                  >
+                    <div className="absolute top-[-8px] left-1/2 -translate-x-1/2 w-4 h-4 rounded-full shadow-[0_2px_4px_rgba(0,0,0,0.2),inset_-2px_-2px_3px_rgba(0,0,0,0.1),inset_2px_2px_3px_rgba(255,255,255,0.4)] z-10" style={{background: getRandomPinColor()}}>
+                      <div className="absolute w-[2px] h-[6px] bg-[linear-gradient(to_bottom,#999,#666)] left-1/2 top-[14px] -translate-x-1/2 shadow-[1px_1px_2px_rgba(0,0,0,0.3)]"></div>
+                    </div>
+                    <img src={it.src} alt="memory" className="w-[100px] h-[90px] md:w-[160px] md:h-[140px] object-cover block rounded-[2px]" />
+                    <button className="opacity-100 md:opacity-0 md:group-hover:opacity-100 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto transition-opacity duration-200 ease absolute bottom-2 left-1/2 -translate-x-1/2 p-[4px_12px] text-[11px] rounded-[6px] border-none bg-[rgba(239,107,107,0.9)] text-white cursor-pointer font-semibold" onClick={() => removeItem(it.id)}>
+                      Delete
+                    </button>
+                  </div>
+                );
+              }
+
+              return null;
+            })
+            )}
+          </div>
+        </div>
+        
+        {/* Zoom Controls - Fixed Position */}
+        <div className="fixed flex bg-white/95 backdrop-blur-[10px] rounded-[12px] shadow-[0_4px_16px_rgba(0,0,0,0.1)] z-[200] pointer-events-auto select-none bottom-[70px] md:bottom-5 left-2 md:left-5 gap-1 md:gap-2 p-1.5 md:p-2" data-html2canvas-ignore="true">
+          <button className="w-9 h-9 md:w-8 md:h-8 min-w-[36px] md:min-w-[32px] rounded-[8px] border border-[rgba(123,140,217,0.3)] bg-white text-[#7b8cd9] cursor-pointer text-[18px] md:text-[16px] font-semibold flex items-center justify-center transition-all duration-200 ease hover:bg-[#7b8cd9] hover:text-white hover:scale-110" onClick={zoomOut} title="Zoom Out">
+            −
+          </button>
+          <div className="px-1.5 md:px-2 text-[11px] md:text-[13px] font-semibold text-[#4a5568] flex items-center">{Math.round(zoom * 100)}%</div>
+          <button className="w-9 h-9 md:w-8 md:h-8 min-w-[36px] md:min-w-[32px] rounded-[8px] border border-[rgba(123,140,217,0.3)] bg-white text-[#7b8cd9] cursor-pointer text-[18px] md:text-[16px] font-semibold flex items-center justify-center transition-all duration-200 ease hover:bg-[#7b8cd9] hover:text-white hover:scale-110" onClick={resetZoom} title="Reset Zoom">
+            ⟲
+          </button>
+          <button className="w-9 h-9 md:w-8 md:h-8 min-w-[36px] md:min-w-[32px] rounded-[8px] border border-[rgba(123,140,217,0.3)] bg-white text-[#7b8cd9] cursor-pointer text-[18px] md:text-[16px] font-semibold flex items-center justify-center transition-all duration-200 ease hover:bg-[#7b8cd9] hover:text-white hover:scale-110" onClick={zoomIn} title="Zoom In">
+            +
+          </button>
+        </div>
+
+        <button
+          className={`fixed bg-[linear-gradient(135deg,#ffffff_0%,#f4f6ff_100%)] backdrop-blur-[12px] rounded-[14px] shadow-[0_10px_30px_rgba(90,103,216,0.18),0_2px_8px_rgba(0,0,0,0.06)] flex items-center font-bold text-[#4752c4] border border-[rgba(90,103,216,0.15)] z-[200] transition-all duration-200 ease pointer-events-auto select-none bottom-2 right-2 left-2 md:left-auto md:right-[18px] md:bottom-[18px] p-[10px_12px] md:p-[11px_16px] gap-[9px] text-[11px] md:text-[13px] justify-center md:justify-start ${exporting ? 'opacity-60 cursor-not-allowed shadow-none transform-none' : 'cursor-pointer hover:-translate-y-0.5 hover:shadow-[0_8px_24px_rgba(123,140,217,0.3)]'}`}
+          onClick={downloadBoardImage}
+          disabled={exporting}
+          data-html2canvas-ignore="true"
+          title="Save board to your device"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 md:w-[18px] md:h-[18px]">
+            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+            <circle cx="12" cy="13" r="4"></circle>
+          </svg>
+          <span className="text-[11px] md:text-[13px] font-bold text-[#4752c4]">{exporting ? "Saving..." : "Board Camera"}</span>
+        </button>
+      </div>
+
+      {/* Modal Overlay */}
+      {showModal && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-[4px] flex items-center justify-center z-[1000]" onClick={closeModal}>
+          <div className="bg-white/95 backdrop-blur-[20px] rounded-[16px] md:rounded-[20px] shadow-[0_20px_60px_rgba(0,0,0,0.3)] min-w-[90vw] md:min-w-[400px] max-w-[90vw] md:max-w-[500px] p-5 md:p-8 m-4 md:m-0" onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-[20px] md:text-[24px] font-bold mb-4 md:mb-6 text-[#2d3748] font-sans">
+              {modalType === "note" && "Add a New Note"}
+              {modalType === "image" && "Add a New Image"}
+              {modalType === "thought" && "Add a New Thought"}
+            </h3>
+            <form onSubmit={handleSubmit}>
+              {modalType === "image" ? (
+                <>
+                  <div className="mb-5">
+                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Upload Image</label>
+                    <label htmlFor="file-upload" className="w-full p-3 rounded-[10px] border-2 border-dashed border-[rgba(123,140,217,0.3)] bg-[rgba(123,140,217,0.05)] text-[#7b8cd9] cursor-pointer font-semibold text-[14px] transition-all duration-300 ease flex items-center justify-center gap-2">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="17 8 12 3 7 8"/>
+                        <line x1="12" y1="3" x2="12" y2="15"/>
+                      </svg>
+                      Choose Image from Device
+                    </label>
+                    <input
+                      id="file-upload"
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFileUpload}
+                    />
+                    {uploadedFile && (
+                      <div className="mt-3 p-3 rounded-[10px] bg-[rgba(102,187,106,0.1)] text-[#66bb6a] text-[13px] font-semibold flex items-center gap-2">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <polyline points="20 6 9 17 4 12"/>
+                        </svg>
+                        {uploadedFile.name}
+                      </div>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-3 my-4 text-[#a0aec0] text-[13px] font-medium">
+                    <div className="flex-1 h-px bg-[rgba(123,140,217,0.2)]"></div>
+                    <span>OR</span>
+                    <div className="flex-1 h-px bg-[rgba(123,140,217,0.2)]"></div>
+                  </div>
+                  <div className="mb-5">
+                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Image URL</label>
+                    <input
+                      type="url"
+                      className="w-full p-3 rounded-[10px] border border-[rgba(123,140,217,0.2)] text-[14px] font-inherit outline-none bg-white/80 text-[#2d3748] transition-all duration-300 ease box-border focus:border-[rgba(123,140,217,0.5)] focus:shadow-[0_0_0_3px_rgba(123,140,217,0.1)]"
+                      value={formData.url}
+                      onChange={(e) => {
+                        setFormData({ ...formData, url: e.target.value });
+                        setUploadedFile(null);
+                      }}
+                      placeholder="https://example.com/image.jpg"
+                      disabled={!!uploadedFile}
+                    />
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="mb-5">
+                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">
+                      {modalType === "note" ? "Note Content" : "Thought Content"}
+                    </label>
+                    <textarea
+                      className="w-full p-3 rounded-[10px] border border-[rgba(123,140,217,0.2)] text-[14px] font-inherit resize-y min-h-[100px] outline-none bg-white/80 text-[#2d3748] transition-all duration-300 ease box-border focus:border-[rgba(123,140,217,0.5)] focus:shadow-[0_0_0_3px_rgba(123,140,217,0.1)]"
+                      value={formData.text}
+                      onChange={(e) => setFormData({ ...formData, text: e.target.value })}
+                      placeholder={modalType === "note" ? "Write your note here..." : "Share your thought..."}
+                      required
+                    />
+                  </div>
+                  <div className="mb-5">
+                    <label className="block mb-2 text-[14px] font-semibold text-[#4a5568]">Background Color</label>
+                    <input
+                      type="color"
+                      className="w-full h-[50px] p-1 rounded-[10px] border-none cursor-pointer outline-none transition-all duration-300 ease box-border"
+                      value={formData.color}
+                      onChange={(e) => setFormData({ ...formData, color: e.target.value })}
+                    />
+                  </div>
+                </>
+              )}
+              <div className="flex gap-3 mt-6">
+                <button type="button" className="flex-1 p-3 rounded-[10px] border border-[rgba(123,140,217,0.3)] bg-transparent text-[#7b8cd9] cursor-pointer font-semibold text-[15px] transition-all duration-300 ease hover:bg-[#f4f6ff] hover:border-[#7b8cd9]" onClick={closeModal}>
+                  Cancel
+                </button>
+                <button type="submit" className="flex-1 p-3 rounded-[10px] border-none bg-[linear-gradient(135deg,#7b8cd9_0%,#9eadeb_100%)] text-white cursor-pointer font-semibold text-[15px] shadow-[0_4px_16px_rgba(123,140,217,0.25)] transition-all duration-300 ease hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(123,140,217,0.35)]">
+                  Add to Wall
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
   );
 };
 
