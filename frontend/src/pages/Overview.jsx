@@ -208,24 +208,6 @@ const Overview = () => {
             <div className="absolute w-3 h-3 rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]" style={{ top: "194px", left: "560px", background: "#26c6da" }}></div>
             <div className="absolute w-3 h-3 rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]" style={{ top: "314px", left: "440px", background: "#5c6bc0" }}></div>
             <div className="absolute w-3 h-3 rounded-full shadow-[0_3px_8px_rgba(0,0,0,0.25),inset_0_1px_2px_rgba(255,255,255,0.4)]" style={{ top: "354px", left: "590px", background: "#66bb6a" }}></div>
-
-            {/* Camera */}
-            <div className="absolute bottom-3 md:bottom-5 left-3 md:left-5 bg-white/95 backdrop-blur-[10px] p-[6px_10px] md:p-[8px_14px] rounded-[10px] shadow-[0_3px_12px_rgba(0,0,0,0.06)] flex items-center gap-2 text-[10px] md:text-[16px] border-none cursor-pointer transition-all duration-300 ease-in hover:-translate-y-0.5 hover:shadow-[0_6px_20px_rgba(0,0,0,0.12)] text-[#5a67d8]">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-[14px] h-[14px] md:w-[18px] md:h-[18px]">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                <circle cx="12" cy="13" r="4"></circle>
-              </svg>
-              <span className="text-[10px] md:text-[13px] font-medium text-[#5a67d8]">Board Camera</span>
-            </div>
-
-            {/* Edit Button */}
-            <button className="absolute bottom-3 md:bottom-[18px] left-1/2 -translate-x-1/2 bg-white text-[#7b8cd9] p-[6px_16px] md:p-[8px_20px] rounded-[10px] border-none cursor-pointer shadow-[0_4px_16px_rgba(123,140,217,0.12),0_2px_4px_rgba(0,0,0,0.04)] text-[11px] md:text-[13px] font-semibold flex items-center gap-1.5 transition-all duration-300 ease-in hover:bg-[linear-gradient(135deg,#7b8cd9_0%,#9eadeb_100%)] hover:text-white hover:-translate-y-0.5" onClick={() => navigate('/wall/new')}>
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-              </svg>
-              Edit Board
-            </button>
           </div>
         </div>
 
